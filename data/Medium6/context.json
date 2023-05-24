@@ -1,0 +1,6 @@
+{
+    "name": "Medium6",
+    "numberTimeSlotMax": 4.0,
+    "routePerTimeSlotMax": 2.0,
+    "durationTimeSlotMax": 120.0
+}

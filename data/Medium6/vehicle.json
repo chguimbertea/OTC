@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Medium6",
+        "speed": 30.0,
+        "capacity": 110.0,
+        "fixedCollectionTime": 4.0,
+        "collectionTimePerCrate": 0.25,
+        "depotAdress": "25 route de Vaulx 69150 D\u00e9cines",
+        "depotLatitude": 45.777716,
+        "depotLongitude": 4.950176,
+        "earliestStart": 7,
+        "latestEnd": 16
+    }
+]

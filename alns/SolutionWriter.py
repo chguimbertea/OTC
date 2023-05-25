@@ -22,9 +22,9 @@ def writeClient(client, order):
     dictClient = {
         "id": client.indice,
         "order": order,
-        "name": client.name,
-        "latitude": client.location[0],
-        "longitude": client.location[1]
+        "name": client.nom,
+        "latitude": client.localisation.to_tuple()[0],
+        "longitude": client.localisation.to_tuple()[1]
     }
     return dictClient
 

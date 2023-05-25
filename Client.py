@@ -1,5 +1,8 @@
+from Localisation import Localisation
+
+
 class Client:
-    def __init__(self, indice=-1, quantite=0, capacite=-1, requete=False, localisation=None, horaires=None,
+    def __init__(self, indice=-1, quantite=0, capacite=-1, requete=False, localisation=Localisation(), horaires=None,
                  dernier_passage=0, nom="point"):
         self.indice = indice
         self.nom = nom
@@ -10,12 +13,22 @@ class Client:
         self.dernier_passage = dernier_passage  # Timestamp ?
         self.horaires = [[0, 24]] if horaires is None else horaires
         self.indicateurTri = 1
+        self.visite = False
 
     def ratio(self):
         return self.quantite / self.capacite
 
     def priority(self):
         return (1 + self.requete) * self.ratio()
+
+    def isVisited(self):
+        return self.visite
+
+    def setVisited(self):
+        self.visite = True
+
+    def setNotVisited(self):
+        self.visite = False
 
     def display(self):
         print("- Client = {c} : {nom}".format(c=self.indice, nom=self.nom))

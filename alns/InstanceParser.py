@@ -2,7 +2,7 @@ import pandas as pd
 import json
 from geopy.geocoders import Nominatim
 from alns.Instance import Instance
-from alns.Customer import Customer
+from Client import Client
 from alns.Vehicle import Vehicle
 
 
@@ -19,7 +19,7 @@ def read_depot(df, name, index):
     earliestStart = df['earliestStart']
     latestEnd = 24 if df['latestEnd'] == 0 else df['latestEnd']
     hours = [[earliestStart, latestEnd]]
-    return Customer(indice=index, location=location, businessHours=hours, name="depot_" + name)
+    return Client(indice=index, localisation=location, horaires=hours, nom="depot_" + name)
 
 
 def read_vehicle(dfVehicle, index):
@@ -64,10 +64,10 @@ def read_client(dfClient, index):
     location = (dfClient['latitude'], dfClient['longitude'])
     businessHours = dfClient['hours'] if 'hours' in dfClient.index else None
     if capacity == 0:
-        return Customer(indice=index, name=name, quantity=quantity, request=request, location=location,
-                        lastCollect=lastCollect, businessHours=businessHours)
-    return Customer(indice=index, name=name, quantity=quantity, capacity=capacity, request=request, location=location,
-                    lastCollect=lastCollect, businessHours=businessHours)
+        return Client(indice=index, nom=name, quantite=quantity, requete=request, localisation=location,
+                      dernier_passage=lastCollect, horaires=businessHours)
+    return Client(indice=index, nom=name, quantite=quantity, capacite=capacity, requete=request, localisation=location,
+                  dernier_passage=lastCollect, horaires=businessHours)
 
 
 def read_clients(fileName):

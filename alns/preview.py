@@ -9,7 +9,7 @@ def preview(solution, filename=None):
 
     # Clients
     for client in solution.instance.listClient:
-        folium.CircleMarker(location=client.location, popup=client.name, radius=RADIUS).add_to(routing)
+        folium.CircleMarker(location=client.localisation.to_tuple(), popup=client.nom, radius=RADIUS).add_to(routing)
 
     idColor = 0
     for timeslot in solution.listTimeSlot:
@@ -21,15 +21,15 @@ def preview(solution, filename=None):
 
             # Depot
             depot = route.trajet[0]
-            folium.Marker(depot.location, popup=depot.name,
+            folium.Marker(depot.localisation.to_tuple(), popup=depot.name,
                           icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(routing)
 
             # Routing
             clientsLocation = []
             for client in route.trajet:
-                clientsLocation.append(client.location)
+                clientsLocation.append(client.localisation.to_tuple())
                 if client.indice < 999:
-                    folium.Marker(client.location, popup=client.indice,
+                    folium.Marker(client.localisation.to_tuple(), popup=client.indice,
                                   icon=folium.Icon(color=colors[idColor], icon='boxes-stacked', prefix='fa')).add_to(
                         routing)
             folium.PolyLine(clientsLocation, color=colors[idColor]).add_to(routing)
@@ -65,12 +65,12 @@ def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientIn
     if focalPoint is not None:
         folium.Marker(focalPoint, popup='focal', icon=folium.Icon(color='black')).add_to(view)
     for point in listAllClient:
-        folium.CircleMarker(location=point.location, popup=point.name, color=allColor, radius=RADIUS).add_to(view)
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=allColor, radius=RADIUS).add_to(view)
     for point in listClientInside:
-        folium.CircleMarker(location=point.location, popup=point.name, color=insideColor, radius=RADIUS).add_to(view)
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=insideColor, radius=RADIUS).add_to(view)
     for point in listSelectedClient:
-        folium.CircleMarker(location=point.location, popup=point.name, color=selectedColor, radius=RADIUS).add_to(view)
-        folium.Marker(point.location, popup=point.indice,
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=selectedColor, radius=RADIUS).add_to(view)
+        folium.Marker(point.localisation.to_tuple(), popup=point.indice,
                       icon=folium.Icon(color=selectedColor, icon='boxes-stacked', prefix='fa')).add_to(view)
     if listConvexHullPoint:
         folium.PolyLine(listConvexHullPoint, color=convexHullColor).add_to(view)

@@ -2,7 +2,7 @@ import json
 from alns.TimeSlot import TimeSlot
 from alns.Route import Route
 from alns.Vehicle import Vehicle
-from alns.Customer import Customer
+from Client import Client
 from alns.Solution import Solution
 from alns.InstanceParser import parse
 
@@ -16,16 +16,16 @@ def findVehicle(dataVehicle, listVehicle):
             return v
     fct = float(dataVehicle['fixedCollectionTime'])
     ctc = float(dataVehicle['collectionTimePerCrate'])
-    return Vehicle(capacity, speed, fct, ctc, Customer(), name=name)
+    return Vehicle(capacity, speed, fct, ctc, Client(), name=name)
 
 
 def readClient(dataClients, listClient):
-    clients = [Customer() for i in dataClients]
+    clients = [Client() for i in dataClients]
     for dataClient in dataClients:
         i = dataClient['id']
         name = dataClient['name']
         client = listClient[i]
-        if client.name != name:
+        if client.nom != name:
             raise Exception("Wrong id : {id}".format(id=i))
         order = dataClient['order']
         if order < 0 or len(clients) <= order:

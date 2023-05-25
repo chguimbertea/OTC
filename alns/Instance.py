@@ -16,7 +16,7 @@ class Instance:
             if vehicle.depot.indice == -1:
                 continue
             tmpListPoint.append(vehicle.depot)
-        self.distTravel = {(i.indice, j.indice): gd.geodesic(i.location, j.location).km
+        self.distTravel = {(i.indice, j.indice): gd.geodesic(i.localisation.to_tuple(), j.localisation.to_tuple()).km
                            for i in tmpListPoint for j in tmpListPoint}
 
     def getDistance(self, firstClientId, secondClientId):  # km

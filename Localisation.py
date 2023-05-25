@@ -24,6 +24,9 @@ class Localisation:
         self.lon = loc.longitude
         return True
 
+    def to_tuple(self):
+        return self.lat, self.lon
+
     def to_string(self):
         return "({lat}, {lon})".format(lat=self.lat, lon=self.lon)
 

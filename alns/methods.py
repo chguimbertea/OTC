@@ -16,12 +16,12 @@ def fast_check(listClient, ntm, rpt, dtm):
         return False
     for client in listClient:
         isOpen = False
-        for hours in client.businessHours:
+        for hours in client.horaires:
             if hours and hours[0] < hours[1]:
                 isOpen = True
                 break
         if not isOpen:
-            print("Client n°{i} : {name}, isn't open today".format(i=client.indice, name=client.name))
+            print("Client n°{i} : {name}, isn't open today".format(i=client.indice, name=client.nom))
             return False
     return True
 

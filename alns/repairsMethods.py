@@ -62,7 +62,7 @@ def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMa
     for timeSlot in solution.listTimeSlot:
         for route in timeSlot.listRoute:
             # Si l'ajout de clientMissing est possible au niveau capacité alors on essaie toutes les positions
-            if clientMissing.quantity + route.getTotalQuantity() <= route.vehicle.capacity:
+            if clientMissing.quantite + route.getTotalQuantity() <= route.vehicle.capacity:
                 # si la route est vide :
                 if len(route.trajet) == 2:
                     route.insertClient(1, clientMissing)
@@ -302,7 +302,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                     position = 1
 
                 # Si le client est ajoutable d'un point de vue capacité
-                if route.getTotalQuantity() + clientMissing.quantity < route.vehicle.capacity:
+                if route.getTotalQuantity() + clientMissing.quantite < route.vehicle.capacity:
                     # Ajout du client
                     route.insertClient(position, clientMissing)
 

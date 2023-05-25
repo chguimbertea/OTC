@@ -40,7 +40,7 @@ class Route:
         elif index == 0 or index <= -size:
             index = 1
         self.trajet.insert(index, client)
-        self.totalQuantity += client.quantity
+        self.totalQuantity += client.quantite
 
     def removeClient(self, clientToRemove):
         i = 0
@@ -57,13 +57,13 @@ class Route:
         if index == 0 or index == -size or index == size-1 or index == -1:
             raise Exception("Can't remove depot in route")
         client = self.trajet.pop(index)
-        self.totalQuantity -= client.quantity
+        self.totalQuantity -= client.quantite
         return client
 
     def getTotalQuantity(self):
         self.totalQuantity = 0
         for client in self.trajet:
-            self.totalQuantity += client.quantity
+            self.totalQuantity += client.quantite
         return self.totalQuantity
 
     def getDuration(self, distFunction):
@@ -81,7 +81,7 @@ class Route:
                                 clientArrivee.indice) / self.vehicle.speed * 60
             self.duration += time
             self.duration += self.vehicle.fixedCollectionTime
-            self.duration += self.vehicle.collectionTimePerCrate * clientArrivee.quantity
+            self.duration += self.vehicle.collectionTimePerCrate * clientArrivee.quantite
 
             clientDepart = clientArrivee
 
@@ -103,18 +103,18 @@ class Route:
     def collectionTimeByClient(self, client):
         if client.indice > 999:
             return 0
-        return self.vehicle.fixedCollectionTime + self.vehicle.collectionTimePerCrate * client.quantity
+        return self.vehicle.fixedCollectionTime + self.vehicle.collectionTimePerCrate * client.quantite
 
     def canPass(self, distFunction):
         client = self.trajet[0]
-        passage = 60 * client.businessHours[0][0]
+        passage = 60 * client.horaires[0][0]
         allpassage = [passage / 60]
         for nextClient in self.trajet[1:]:
             dist = distFunction(client.indice, nextClient.indice)
             travelTime = dist / self.vehicle.speed * 60  # min
             deltaTime = passage + self.collectionTimeByClient(client) + travelTime
             canPass = False
-            for start, end in nextClient.businessHours:
+            for start, end in nextClient.horaires:
                 start = 60 * start
                 end = 60 * end
                 if deltaTime <= end:
@@ -155,4 +155,4 @@ class Route:
         print("\t\t- Trajet : {route}".format(route=route))
         if showTimeTable:
             for client in self.trajet:
-                print("\t\tPassage in {h}".format(h=client.businessHours))
+                print("\t\tPassage in {h}".format(h=client.horaires))

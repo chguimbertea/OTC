@@ -1,26 +1,16 @@
+from Client import Client
 from alns.ALNS import ALNS
-from alns.Customer import Customer
 from alns.Instance import Instance
 from alns.Vehicle import Vehicle
 
 
 def solve(list_client, collecteur):
-    new_list_client = []
-    for client in list_client:
-        new_client = Customer(indice=client.indice,
-                              quantity=client.quantite,
-                              capacity=client.capacite,
-                              request=client.requete,
-                              location=(client.localisation.lat, client.localisation.lon),
-                              businessHours=client.horaires,
-                              lastCollect=client.dernier_passage,
-                              name=client.nom)
-        new_list_client.append(new_client)
+    new_list_client = list_client
 
     new_list_vehicle = []
     id_depot = 1000
-    depot = Customer(indice=id_depot, location=(collecteur.localisation.lat, collecteur.localisation.lon),
-                     businessHours=collecteur.horaires, name="depot_" + collecteur.nom)
+    depot = Client(indice=id_depot, localisation=collecteur.localisation,
+                   horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
     v = Vehicle(collecteur.vehicule_capacite, collecteur.vehicule_vitesse,
                 collecteur.temps_collecte_fixe, collecteur.temps_collecte_caisse,
                 depot,

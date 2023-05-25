@@ -65,7 +65,7 @@ def destroy_Client_with_a_request_placed_at_the_end_of_the_solution(solution, de
     nbClientRequested = 0
 
     for client in listClient:
-        if client.isRequested():
+        if client.requete:
             nbClientRequested += 1
 
     numberOfClientToDestroy = degree_destruction
@@ -84,7 +84,7 @@ def destroy_Client_with_a_request_placed_at_the_end_of_the_solution(solution, de
             timeSlot = solution.listTimeSlot[indiceTimeSlot]
             for route in timeSlot.listRoute:
                 for client in route.trajet:
-                    if client.isRequested():
+                    if client.requete:
                         route.removeClient(client)
                         nbClientDestroyed += 1
                         if nbClientDestroyed >= numberOfClientToDestroy:
@@ -121,7 +121,7 @@ def destroy_Client_with_a_high_ratio_placed_at_the_end_of_the_solution(solution,
                     client = route.getClientByIndex(indiceClient)
 
                     # Calcul du ratio plus 1 s'il est requested
-                    ratio = client.ratio() + 1 * client.isRequested()
+                    ratio = client.ratio() + client.requete
 
                     # Si le ratio est supérieur à la borne max, alors on supprime le client
                     if ratio >= ratioMax:
@@ -219,7 +219,7 @@ def destroy_related_clients(solution, degree_destruction, listClient, alpha=0.5,
         for client in liste:  # taille de la matrice des distances
             if client not in removed_clients:
                 dist = solution.instance.getDistance(choosed_client.indice, client.indice)
-                delta = abs(int(choosed_client.request) - int(client.request))
+                delta = abs(int(choosed_client.requete) - int(client.requete))
                 ratio = abs((choosed_client.ratio()) - (client.ratio()))
                 Related = alpha * dist + beta * delta + gamma * ratio
                 if Related < Related_min:

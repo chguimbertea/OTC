@@ -127,7 +127,7 @@ class Solution:
                                                             * indexTimeSlot) / 10
 
                             # Calcul de Z3
-                            if clientArrivee.isRequested():
+                            if clientArrivee.requete:
                                 self.inventoryPriorityPenalty += indexTimeSlot
 
         # Calcul de Z4

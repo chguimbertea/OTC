@@ -1,7 +1,7 @@
 """
 Source from project ALNS 2022, ALEXI OMAR DJAMA
 """
-import geopy.distance as gd
+from methodes import distance
 
 
 class Instance:
@@ -16,11 +16,13 @@ class Instance:
             if vehicle.depot.indice == -1:
                 continue
             tmpListPoint.append(vehicle.depot)
-        self.distTravel = {(i.indice, j.indice): gd.geodesic(i.localisation.to_tuple(), j.localisation.to_tuple()).km
-                           for i in tmpListPoint for j in tmpListPoint}
+        self.distTravel = {(i.indice, j.indice): distance(i.localisation, j.localisation)
+                           for i in tmpListPoint for j in tmpListPoint if i.indice < j.indice}  # km
 
     def getDistance(self, firstClientId, secondClientId):  # km
-        return self.distTravel[(firstClientId, secondClientId)]
+        if firstClientId == secondClientId:
+            return 0
+        return self.distTravel[(min(firstClientId, secondClientId), max(firstClientId, secondClientId))]
 
     def copy(self):
         return Instance(self.listClient.copy(), self.listVehicle.copy(), self.name)

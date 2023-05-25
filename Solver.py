@@ -63,7 +63,7 @@ class Solver:
 
             # RECHERCHE DE POINTS SUPPLÉMENTAIRES POTENTIELS
             # SOIT À L'INTÉRIEUR DE L'ENVELOPPE CONVEXE
-            # hullPoint = md.convexHull(selectedClient.copy(), instance.getDistance)
+            # hullPoint = md.convexHull(selectedClient.copy())
             # inside = md.inside_intersection(orderedList.copy(), hullPoint, focalPoint, residualQuantity)
             # SOIT PROCHE D'UN SEGMENT DE ROUTE
             inside = md.inside_near_points(orderedList.copy(), current_solution, residualQuantity)

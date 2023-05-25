@@ -77,8 +77,7 @@ class Route:
             clientArrivee = self.trajet[i]
 
             # time in minutes
-            time = distFunction(clientDepart.indice,
-                                clientArrivee.indice) / self.vehicle.speed * 60
+            time = distFunction(clientDepart.indice, clientArrivee.indice) / self.vehicle.speed * 60
             self.duration += time
             self.duration += self.vehicle.fixedCollectionTime
             self.duration += self.vehicle.collectionTimePerCrate * clientArrivee.quantite

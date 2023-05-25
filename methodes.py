@@ -1,8 +1,12 @@
 import math
 import geopy.distance as gd
 
+cpt = 0
+
 
 def distance(locI, locJ):
+    global cpt
+    cpt += 1
     return gd.geodesic(locI.to_tuple(), locJ.to_tuple()).km
 
 
@@ -85,22 +89,22 @@ def pseudo_angle(A, B, C):
     return determinant(u, v)
 
 
-def compare(distFct, A, B, C):
+def compare(A, B, C):
     t = pseudo_angle(A.localisation.to_tuple(), B.localisation.to_tuple(), C.localisation.to_tuple())
     if t > 0:
         return True
     elif t < 0:
         return False
     else:
-        return distFct(A.indice, B.indice) <= distFct(A.indice, C.indice)
+        return distance(A.localisation, B.localisation) <= distance(A.localisation, C.localisation)
 
 
-def convexHull(listClient, distFct):
+def convexHull(listClient):
     clientHull = [leftmost_client(listClient)]
 
     candidat = listClient[0]
     for client in listClient:
-        if compare(distFct, clientHull[-1], candidat, client):
+        if compare(clientHull[-1], candidat, client):
             candidat = client
     clientHull.append(candidat)
     listClient.remove(clientHull[-1])
@@ -108,7 +112,7 @@ def convexHull(listClient, distFct):
     while clientHull[-1] != clientHull[0] and listClient:
         candidat = listClient[0]
         for client in listClient:
-            if compare(distFct, clientHull[-1], candidat, client):
+            if compare(clientHull[-1], candidat, client):
                 candidat = client
         clientHull.append(candidat)
         listClient.remove(clientHull[-1])

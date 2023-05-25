@@ -158,6 +158,7 @@ class Solution:
             for client in self.instance.listClient:
                 self.satisfaction += client.priorite() * notInRoute[client.indice]
 
+        # duration ?!!
         cost = pow(self.satisfaction, alpha) + pow(self.fillRate, beta) + pow(self.usingCost, gamma)
         return cost
 

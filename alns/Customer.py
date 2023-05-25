@@ -19,29 +19,17 @@ class Customer:
             self.businessHours = sorted(businessHours)
         self.visited = False
 
-    def getIndice(self):
-        return self.indice
-
-    def getQuantity(self):
-        return self.quantity
-
-    def getCapacity(self):
-        return self.capacity
-
     def isRequested(self):
         return self.request > 0
 
-    def getRatio(self):
+    def ratio(self):
         return self.quantity / self.capacity
 
-    def getPriority(self):
-        return (1 + self.request) * self.getRatio()
+    def priority(self):
+        return (1 + self.request) * self.ratio()
 
     def isVisited(self):
         return self.visited
-
-    def setRequest(self, requested):
-        self.request = requested
 
     def setVisited(self):
         self.visited = True
@@ -56,4 +44,4 @@ class Customer:
         print("\tRequested = {r}".format(r=self.request))
         print("\tOpen : {hours}".format(hours=self.businessHours))
         print("\tVisited = {v}".format(v=self.visited))
-        print("\tPriority = {p}".format(p=self.getPriority()))
+        print("\tPriority = {p}".format(p=self.priority()))

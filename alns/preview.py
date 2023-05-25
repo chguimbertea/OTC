@@ -12,21 +12,21 @@ def preview(solution, filename=None):
         folium.CircleMarker(location=client.location, popup=client.name, radius=RADIUS).add_to(routing)
 
     idColor = 0
-    for timeslot in solution.getListTimeSlot():
-        for route in timeslot.getListRoute():
-            if len(route.getTrajet()) == 0:
+    for timeslot in solution.listTimeSlot:
+        for route in timeslot.listRoute:
+            if len(route.trajet) == 0:
                 continue
 
             idColor = idColor % len(colors)
 
             # Depot
-            depot = route.getTrajet()[0]
+            depot = route.trajet[0]
             folium.Marker(depot.location, popup=depot.name,
                           icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(routing)
 
             # Routing
             clientsLocation = []
-            for client in route.getTrajet():
+            for client in route.trajet:
                 clientsLocation.append(client.location)
                 if client.indice < 999:
                     folium.Marker(client.location, popup=client.indice,
@@ -36,7 +36,7 @@ def preview(solution, filename=None):
 
             idColor += 1
 
-    filename = solution.instance.getName() if filename is None else filename
+    filename = solution.instance.name if filename is None else filename
     name = "{name}.html".format(name=filename)
     routing.save(name)
     print(name + " has been saved")

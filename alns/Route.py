@@ -8,7 +8,7 @@ class Route:
 
     def __init__(self, vehicle, indice=None):
         self.vehicle = vehicle
-        if self.vehicle.depot.getIndice() == -1:
+        if self.vehicle.depot.indice == -1:
             raise Exception("Vehicle without depot can't start a route")
         self.trajet = [vehicle.depot, vehicle.depot]
         self.totalQuantity = 0
@@ -18,12 +18,6 @@ class Route:
             Route.INDICE += 1
         else:
             self.indice = indice
-
-    def getIndice(self):
-        return self.indice
-
-    def getTrajet(self):
-        return self.trajet
 
     def isEmpty(self):
         return len(self.trajet) <= 2
@@ -35,7 +29,7 @@ class Route:
         return self.trajet[index]
 
     def appendClient(self, client):
-        if client.getIndice() > 999:
+        if client.indice > 999:
             return
         self.insertClient(-1, client)
 
@@ -46,12 +40,12 @@ class Route:
         elif index == 0 or index <= -size:
             index = 1
         self.trajet.insert(index, client)
-        self.totalQuantity += client.getQuantity()
+        self.totalQuantity += client.quantity
 
     def removeClient(self, clientToRemove):
         i = 0
         for client in self.trajet:
-            if clientToRemove.getIndice() == client.getIndice():
+            if clientToRemove.indice == client.indice:
                 break
             i = i + 1
         return self.removeClientByPosition(i)
@@ -63,13 +57,13 @@ class Route:
         if index == 0 or index == -size or index == size-1 or index == -1:
             raise Exception("Can't remove depot in route")
         client = self.trajet.pop(index)
-        self.totalQuantity -= client.getQuantity()
+        self.totalQuantity -= client.quantity
         return client
 
     def getTotalQuantity(self):
         self.totalQuantity = 0
         for client in self.trajet:
-            self.totalQuantity += client.getQuantity()
+            self.totalQuantity += client.quantity
         return self.totalQuantity
 
     def getDuration(self, distFunction):
@@ -83,11 +77,11 @@ class Route:
             clientArrivee = self.trajet[i]
 
             # time in minutes
-            time = distFunction(clientDepart.getIndice(),
-                                clientArrivee.getIndice()) / self.vehicle.getSpeed() * 60
+            time = distFunction(clientDepart.indice,
+                                clientArrivee.indice) / self.vehicle.speed * 60
             self.duration += time
-            self.duration += self.vehicle.getFixedCollectionTime()
-            self.duration += self.vehicle.getCollectionTimePerCrate() * clientArrivee.getQuantity()
+            self.duration += self.vehicle.fixedCollectionTime
+            self.duration += self.vehicle.collectionTimePerCrate * clientArrivee.quantity
 
             clientDepart = clientArrivee
 
@@ -96,7 +90,7 @@ class Route:
     def getTotalDistance(self, distFunction):
         dist = 0
         for i in range(0, len(self.trajet) - 1):
-            dist += distFunction(self.trajet[i].getIndice(), self.trajet[i + 1].getIndice())
+            dist += distFunction(self.trajet[i].indice, self.trajet[i + 1].indice)
         return dist
 
     def getVehicleCost(self, distFunction):
@@ -107,16 +101,16 @@ class Route:
         return cost
 
     def collectionTimeByClient(self, client):
-        if client.getIndice() > 999:
+        if client.indice > 999:
             return 0
-        return self.vehicle.getFixedCollectionTime() + self.vehicle.getCollectionTimePerCrate() * client.getQuantity()
+        return self.vehicle.fixedCollectionTime + self.vehicle.collectionTimePerCrate * client.quantity
 
     def canPass(self, distFunction):
         client = self.trajet[0]
         passage = 60 * client.businessHours[0][0]
         allpassage = [passage / 60]
         for nextClient in self.trajet[1:]:
-            dist = distFunction(client.getIndice(), nextClient.getIndice())
+            dist = distFunction(client.indice, nextClient.indice)
             travelTime = dist / self.vehicle.speed * 60  # min
             deltaTime = passage + self.collectionTimeByClient(client) + travelTime
             canPass = False
@@ -155,9 +149,9 @@ class Route:
         print("\tRoute {i} :".format(i=positionInListTimeSlot))
         print("\t\t- Total Quantity = {q}/{c}".format(q=self.totalQuantity, c=self.vehicle.capacity))
         print("\t\t- Duration = {d}".format(d=round(self.duration, 2)))
-        route = "{i}".format(i=self.trajet[0].getIndice())
+        route = "{i}".format(i=self.trajet[0].indice)
         for client in self.trajet[1:]:
-            route += " -> {i}".format(i=client.getIndice())
+            route += " -> {i}".format(i=client.indice)
         print("\t\t- Trajet : {route}".format(route=route))
         if showTimeTable:
             for client in self.trajet:

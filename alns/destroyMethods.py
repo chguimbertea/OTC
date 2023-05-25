@@ -82,8 +82,8 @@ def destroy_Client_with_a_request_placed_at_the_end_of_the_solution(solution, de
     if len(solution.listTimeSlot) >= 2:
         for indiceTimeSlot in range(len(solution.listTimeSlot) - 1, 0, -1):
             timeSlot = solution.listTimeSlot[indiceTimeSlot]
-            for route in timeSlot.getListRoute():
-                for client in route.getTrajet():
+            for route in timeSlot.listRoute:
+                for client in route.trajet:
                     if client.isRequested():
                         route.removeClient(client)
                         nbClientDestroyed += 1
@@ -116,12 +116,12 @@ def destroy_Client_with_a_high_ratio_placed_at_the_end_of_the_solution(solution,
         clientDestroyed = False
         for indiceTimeSlot in range(len(solution.listTimeSlot) - 1, 0, -1):
             timeSlot = solution.listTimeSlot[indiceTimeSlot]
-            for route in timeSlot.getListRoute():
+            for route in timeSlot.listRoute:
                 for indiceClient in range(1, len(route.trajet) - 1):
                     client = route.getClientByIndex(indiceClient)
 
                     # Calcul du ratio plus 1 s'il est requested
-                    ratio = client.getRatio() + 1*client.isRequested()
+                    ratio = client.ratio() + 1 * client.isRequested()
 
                     # Si le ratio est supérieur à la borne max, alors on supprime le client
                     if ratio >= ratioMax:
@@ -218,19 +218,19 @@ def destroy_related_clients(solution, degree_destruction, listClient, alpha=0.5,
         Related_min = 200
         for client in liste:  # taille de la matrice des distances
             if client not in removed_clients:
-                dist = solution.instance.getDistance(choosed_client.getIndice(), client.getIndice())
+                dist = solution.instance.getDistance(choosed_client.indice, client.indice)
                 delta = abs(int(choosed_client.request) - int(client.request))
-                ratio = abs((choosed_client.getRatio()) - (client.getRatio()))
+                ratio = abs((choosed_client.ratio()) - (client.ratio()))
                 Related = alpha * dist + beta * delta + gamma * ratio
                 if Related < Related_min:
                     Related_min = Related
                     client_plus_proche = client
         removed_clients.append(client_plus_proche)
 
-        for timeslot in solution.getListTimeSlot():
-            for route in timeslot.getListRoute():
-                for client in route.getTrajet():
-                    if client.getIndice() == client_plus_proche.getIndice():
+        for timeslot in solution.listTimeSlot:
+            for route in timeslot.listRoute:
+                for client in route.trajet:
+                    if client.indice == client_plus_proche.indice:
                         route.removeClient(client)
         nbIteration += 1
 

@@ -16,25 +16,11 @@ class TimeSlot:
         else:
             self.indice = indice
 
-    def getIndice(self):
-        return self.indice
-
-    def getListRoute(self):
-        return self.listRoute
-
     def appendRoute(self, route):
         self.listRoute.append(route)
 
     def removeRoute(self, routeToRemove):
-        i = 0
-        for route in self.listRoute:
-            if route.getIndice() == routeToRemove.getIndice():
-                break
-            i += 1
-        return self.removeRouteByPosition(i)
-
-    def removeRouteByPosition(self, positionRouteToRemove):
-        return self.listRoute.pop(positionRouteToRemove)
+        self.listRoute.remove(routeToRemove)
 
     def getDuration(self, distFunction):
         s = 0

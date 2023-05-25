@@ -13,14 +13,11 @@ class Instance:
         # DISTANCE BETWEEN EVERY POINT
         tmpListPoint = listClient.copy()
         for vehicle in self.listVehicle:
-            if vehicle.depot.getIndice() == -1:
+            if vehicle.depot.indice == -1:
                 continue
             tmpListPoint.append(vehicle.depot)
-        self.distTravel = {(i.getIndice(), j.getIndice()): gd.geodesic(i.location, j.location).km
+        self.distTravel = {(i.indice, j.indice): gd.geodesic(i.location, j.location).km
                            for i in tmpListPoint for j in tmpListPoint}
-
-    def getName(self):
-        return self.name
 
     def getDistance(self, firstClientId, secondClientId):  # km
         return self.distTravel[(firstClientId, secondClientId)]

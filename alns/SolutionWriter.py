@@ -5,11 +5,11 @@ from alns.Solution import Solution
 
 def writeVehicle(vehicle):
     dictVehicle = {
-        "name": vehicle.getName(),
-        "capacity": str(vehicle.getCapacity()),
-        "speed": str(vehicle.getSpeed()),
-        "fixedCollectionTime": str(vehicle.getFixedCollectionTime()),
-        "collectionTimePerCrate": str(vehicle.getCollectionTimePerCrate()),
+        "name": vehicle.name,
+        "capacity": str(vehicle.capacity),
+        "speed": str(vehicle.speed),
+        "fixedCollectionTime": str(vehicle.fixedCollectionTime),
+        "collectionTimePerCrate": str(vehicle.collectionTimePerCrate),
         "fixedCost": str(vehicle.fixedCost),
         "kmCost": str(vehicle.kmCost),
         "crateCost": str(vehicle.crateCost),
@@ -20,7 +20,7 @@ def writeVehicle(vehicle):
 
 def writeClient(client, order):
     dictClient = {
-        "id": client.getIndice(),
+        "id": client.indice,
         "order": order,
         "name": client.name,
         "latitude": client.location[0],
@@ -36,8 +36,8 @@ def writeRoute(route, idRoute):
         "vehicle": [writeVehicle(route.vehicle)],
         "route": []
     }
-    for order in range(len(route.getTrajet())):
-        client = route.getTrajet()[order]
+    for order in range(len(route.trajet)):
+        client = route.trajet[order]
         dictRoute["route"].append(writeClient(client, order))
     return dictRoute
 
@@ -48,15 +48,15 @@ def writeTimeSlot(timeSlot, idTimeSlot):
         "duration": timeSlot.duration,
         "timeSlot": []
     }
-    for idRoute in range(len(timeSlot.getListRoute())):
-        route = timeSlot.getListRoute()[idRoute]
+    for idRoute in range(len(timeSlot.listRoute)):
+        route = timeSlot.listRoute[idRoute]
         dictTimeSlot["timeSlot"].append(writeRoute(route, idRoute))
     return dictTimeSlot
 
 
 def toJson(solution, solutionPath="./result/", fileName=None):
     dictResult = {
-        "name": solution.instance.getName(),
+        "name": solution.instance.name,
         "nIter": solution.nIter,
         "number max of timeslot": solution.numberTimeSlotMax,
         "number max of route per timeslot": solution.routePerTimeSlotMax,
@@ -81,12 +81,12 @@ def toJson(solution, solutionPath="./result/", fileName=None):
         "total time": solution.totalTime,
         "routing": []
     }
-    for idTimeSlot in range(len(solution.getListTimeSlot())):
-        timeSlot = solution.getListTimeSlot()[idTimeSlot]
+    for idTimeSlot in range(len(solution.listTimeSlot)):
+        timeSlot = solution.listTimeSlot[idTimeSlot]
         dictResult["routing"].append(writeTimeSlot(timeSlot, idTimeSlot))
 
     if fileName is None:
-        fileName = solution.instance.getName()
+        fileName = solution.instance.name
     solutionName = solutionPath + fileName + ".json"
     with open(solutionName, "w") as outfile:
         json.dump(dictResult, outfile, indent=4)
@@ -96,7 +96,7 @@ def toJson(solution, solutionPath="./result/", fileName=None):
 
 def toCsv(solution, solutionPath="./result/", fileName=None, reset=False):
     if fileName is None:
-        fileName = solution.instance.getName()
+        fileName = solution.instance.name
     solutionName = solutionPath + fileName + ".csv"
     if not os.path.isfile(solutionName) or reset:
         with open(solutionName, "w") as outfile:

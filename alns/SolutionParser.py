@@ -12,7 +12,7 @@ def findVehicle(dataVehicle, listVehicle):
     capacity = int(dataVehicle['capacity'])
     speed = float(dataVehicle['speed'])
     for v in listVehicle:
-        if v.getName() == name and v.getCapacity() == capacity and v.getSpeed() == speed:
+        if v.name == name and v.capacity == capacity and v.speed == speed:
             return v
     fct = float(dataVehicle['fixedCollectionTime'])
     ctc = float(dataVehicle['collectionTimePerCrate'])
@@ -39,7 +39,7 @@ def readRoute(dataRoute, listClient, listVehicle):
     vehicle = findVehicle(dataRoute['vehicle'][0], listVehicle)
     route = Route(vehicle)
     route.trajet = readClient(dataRoute['route'], listClient)
-    if route.vehicle.depot.getIndice() == -1:
+    if route.vehicle.depot.indice == -1:
         route.vehicle.depot = route.trajet[0]
     return route
 

@@ -21,7 +21,7 @@ def fast_check(listClient, ntm, rpt, dtm):
                 isOpen = True
                 break
         if not isOpen:
-            print("Client n°{i} : {name}, isn't open today".format(i=client.getIndice(), name=client.name))
+            print("Client n°{i} : {name}, isn't open today".format(i=client.indice, name=client.name))
             return False
     return True
 
@@ -85,7 +85,7 @@ def order_ListClient_by_ratio(listClient):
     EN :
     Sort the list of clients in descending order of ratios
     """
-    listClient.sort(key=lambda x: x.getRatio(), reverse=True)
+    listClient.sort(key=lambda x: x.ratio(), reverse=True)
     return listClient
 
 
@@ -135,7 +135,7 @@ def swap_intra_route(solution, listClient):
         possibleRoute = []
         while possibleTimeSlot:
             timeSlot = random.choice(possibleTimeSlot)
-            for route in timeSlot.getListRoute():
+            for route in timeSlot.listRoute:
                 if len(route.trajet) >= 4:
                     possibleRoute.append(route)
             if possibleRoute:
@@ -178,12 +178,12 @@ def swap_inter_route(solution, listClient):
     nbIterationMax = 10
     solutionInitaleAssigned = True
     routes_vides = 0
-    for timeslot in solution.getListTimeSlot():
-        for route in timeslot.getListRoute():
+    for timeslot in solution.listTimeSlot:
+        for route in timeslot.listRoute:
             if len(route.trajet) < 3:
                 routes_vides += 1
 
-    nRoute = sum([len(i.listRoute) for i in solution.getListTimeSlot()])
+    nRoute = sum([len(i.listRoute) for i in solution.listTimeSlot])
     if nRoute <= 2 and routes_vides != 0:
         return
 

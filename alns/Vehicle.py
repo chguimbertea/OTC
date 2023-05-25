@@ -13,27 +13,9 @@ class Vehicle:
         self.crateCost = crateCost
         self.stopCost = stopCost
 
-    def getName(self):
-        return self.name
-
-    def getCapacity(self):
-        return self.capacity
-
-    def getSpeed(self):  # km/h
-        return self.speed
-
-    def getFixedCollectionTime(self):
-        return self.fixedCollectionTime
-
-    def getCollectionTimePerCrate(self):
-        return self.collectionTimePerCrate
-
-    def getCost(self):
-        return self.fixedCost
-
     def display(self):
         print("- Vehicle : {v}".format(v=self.name))
-        print("\tDepot n°{n}".format(n=self.depot.getIndice()))
+        print("\tDepot n°{n}".format(n=self.depot.indice))
         print("\tCapacity = {c}".format(c=self.capacity))
         print("\tSpeed = {s}".format(s=self.speed))
         print("\tFixed collection time = {f}".format(f=self.fixedCollectionTime))

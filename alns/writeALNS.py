@@ -4,7 +4,7 @@ import pandas as pd
 
 def toCsv(alns, outputPath="./result/", outputName=None, reset=False):
     if outputName is None:
-        outputName = alns.instance.getName()
+        outputName = alns.instance.name
     fileName = outputPath + "alns_" + outputName + ".csv"
 
     if not os.path.isfile(fileName) or reset:
@@ -16,7 +16,7 @@ def toCsv(alns, outputPath="./result/", outputName=None, reset=False):
             outfile.write(line + "\n")
     with open(fileName, "a") as outfile:
         line = "{name}; {evolution_cost}; {evolution_iter_best}; {evolution_time_best}; {cost_best}; {iter_best}; " \
-               "{time_best}; {nIter}".format(name=alns.instance.getName(),
+               "{time_best}; {nIter}".format(name=alns.instance.name,
                                              evolution_cost=alns.evolution_cost,
                                              evolution_iter_best=alns.evolution_iter_best,
                                              evolution_time_best=alns.evolution_time_best,
@@ -34,7 +34,7 @@ def toCsv(alns, outputPath="./result/", outputName=None, reset=False):
 
 def toXlsx(alns, outputPath="./result/", outputName=None, reset=False):
     if outputName is None:
-        outputName = alns.instance.getName()
+        outputName = alns.instance.name
     fileName = outputPath + "alns_" + outputName + ".xlsx"
 
     if not os.path.isfile(fileName) or reset:
@@ -43,8 +43,8 @@ def toXlsx(alns, outputPath="./result/", outputName=None, reset=False):
         dfResult = pd.read_excel(fileName)
 
     newdf = pd.DataFrame()
-    print(alns.instance.getName())
-    newdf['Instance'] = [alns.instance.getName()]
+    print(alns.instance.name)
+    newdf['Instance'] = [alns.instance.name]
     print(newdf['Instance'])
     newdf['Evolution_cost'] = [alns.evolution_cost]
     newdf['Evolution_iter_best'] = [alns.evolution_iter_best]

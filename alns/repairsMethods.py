@@ -11,8 +11,8 @@ from alns.SolutionChecker import check
 def get_missing_client_list(listTimeSlot, listClient):
     listClientMissing = []
     for timeSlot in listTimeSlot:
-        for route in timeSlot.getListRoute():
-            for client in route.getTrajet():
+        for route in timeSlot.listRoute:
+            for client in route.trajet:
                 client.setVisited()
 
     # Réinitialisation des attributs visited des clients
@@ -44,7 +44,7 @@ def get_new_timeSlot(vehicle, clientMissing=None):
 def find_position_on_route(solution, listClient, route, clientMissing, nbIterations):
     bound = max(1, len(route.trajet) - 2)
     position = random.randint(1, bound)
-    if route.getTotalQuantity() + clientMissing.getQuantity() < route.vehicle.getCapacity():
+    if route.getTotalQuantity() + clientMissing.quantity < route.vehicle.capacity:
         # Ajout du client
         route.insertClient(position, clientMissing)
 
@@ -59,10 +59,10 @@ def find_position_on_route(solution, listClient, route, clientMissing, nbIterati
 
 def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMax, routePerTimeSlotMax):
     positionFound = False
-    for timeSlot in solution.getListTimeSlot():
-        for route in timeSlot.getListRoute():
+    for timeSlot in solution.listTimeSlot:
+        for route in timeSlot.listRoute:
             # Si l'ajout de clientMissing est possible au niveau capacité alors on essaie toutes les positions
-            if clientMissing.getQuantity() + route.getTotalQuantity() <= route.vehicle.getCapacity():
+            if clientMissing.quantity + route.getTotalQuantity() <= route.vehicle.capacity:
                 # si la route est vide :
                 if len(route.trajet) == 2:
                     route.insertClient(1, clientMissing)
@@ -132,8 +132,8 @@ def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMa
 
 def best_insertion(solution, timeSlot, client, min_cost):
     indice_best_timeslot, indice_best_route, indice_best_client = None, None, None
-    for route in range(len(solution.listTimeSlot[timeSlot].getListRoute())):
-        for indiceClient in range(1, len(solution.listTimeSlot[timeSlot].listRoute[route].getTrajet())):
+    for route in range(len(solution.listTimeSlot[timeSlot].listRoute)):
+        for indiceClient in range(1, len(solution.listTimeSlot[timeSlot].listRoute[route].trajet)):
 
             solution.listTimeSlot[timeSlot].listRoute[route].insertClient(indiceClient, client)
             cost = solution.getCost()
@@ -173,7 +173,7 @@ def repair_randomV2(solution, listClient, vehicle, numberTimeSlotMax, routePerTi
         nbIterationMax = 30
         while nbIterations < nbIterationMax:
             # check(solution, listClient, False, False) #!!?
-            if not solution.getListTimeSlot():
+            if not solution.listTimeSlot:
                 # Ajout du time slot à la solution
                 newTimeSlot = get_new_timeSlot(vehicle, clientMissing)
                 solution.appendTimeSlot(newTimeSlot)
@@ -198,9 +198,9 @@ def repair_randomV2(solution, listClient, vehicle, numberTimeSlotMax, routePerTi
                         nbIterations += 1
                 else:
                     timeSlot = solution.listTimeSlot[positionTimeSlot]
-                    for i in timeSlot.getListRoute():
-                        if len(i.trajet) <= 2:
-                            timeSlot.removeRoute(i)
+                    for route in timeSlot.listRoute:
+                        if len(route.trajet) <= 2:
+                            timeSlot.removeRoute(route)
                     if len(timeSlot.listRoute) + 1 > routePerTimeSlotMax:
                         route = timeSlot.listRoute[random.randint(0, len(timeSlot.listRoute) - 1)]
                         if find_position_on_route(solution, listClient, route, clientMissing, nbIterations):
@@ -252,12 +252,12 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
     in an empty route of an existing time slot.
     """
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
 
     # Mélange des positions manquantes aleatoirement
     listClientMissing = methods.order_ListClient_random(listClientMissing)
 
-    if not solution.getListTimeSlot():
+    if not solution.listTimeSlot:
         # Ajout du time slot à la solution
         newTimeSlot = get_new_timeSlot(vehicle)
         solution.appendTimeSlot(newTimeSlot)
@@ -274,7 +274,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                 timeSlot = solution.listTimeSlot[random.randint(0, len(solution.listTimeSlot) - 1)]
             else:
                 timeSlot = solution.listTimeSlot[0]
-            if not timeSlot.getListRoute():
+            if not timeSlot.listRoute:
                 # Creation de la route 0 => ckientMissing => 0
                 newRoute = get_new_route(vehicle, clientMissing)
 
@@ -302,7 +302,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                     position = 1
 
                 # Si le client est ajoutable d'un point de vue capacité
-                if route.getTotalQuantity() + clientMissing.getQuantity() < route.vehicle.getCapacity():
+                if route.getTotalQuantity() + clientMissing.quantity < route.vehicle.capacity:
                     # Ajout du client
                     route.insertClient(position, clientMissing)
 
@@ -336,11 +336,11 @@ def repair_2_regret(solution, listClient, vehicle):
     that has the biggest difference between its best place and its second best place.
     """
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
     solution.updateCost = True
 
     # si la solution est vide
-    if not solution.getListTimeSlot():
+    if not solution.listTimeSlot:
         # Ajout du time slot à la solution
         newTimeSlot = get_new_timeSlot(vehicle)
         solution.appendTimeSlot(newTimeSlot)
@@ -423,7 +423,7 @@ def repair_FirstPositionAvailable_maxratio_listClient(solution, listClient, vehi
     solutionInitiale = solution.copy()
 
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
 
     # Tri de la liste selon un critère de la méthode orderListOperator
     listClientMissing = methods.order_ListClient_by_ratio(listClientMissing)
@@ -471,7 +471,7 @@ def repair_FirstPositionAvailable_randomlistClient(solution, listClient, vehicle
     solutionInitiale = solution.copy()
 
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
 
     # Tri de la liste selon un critère de la méthode orderListOperator
     listClientMissing = methods.order_ListClient_random(listClientMissing)
@@ -508,12 +508,12 @@ def repair_random_best_insertion(solution, listClient, vehicle, numberTimeSlotMa
     inserted in the solution. The list of clients to be inserted is built randomly.
     """
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
 
     # Tri de la liste selon un critère de la méthode orderListOperator
     listClientMissing = methods.order_ListClient_random(listClientMissing)
 
-    if not solution.getListTimeSlot():
+    if not solution.listTimeSlot:
         # Ajout du time slot à la solution
         newTimeSlot = get_new_timeSlot(vehicle)
         solution.appendTimeSlot(newTimeSlot)
@@ -558,11 +558,11 @@ def repair_max_ratio_best_insertion(solution, listClient, vehicle):
     inserted in the solution. The list of clients to be inserted is built in the decreasing order of the ratio
     """
     # 1 - Recherche des clients manquants
-    listClientMissing = get_missing_client_list(solution.getListTimeSlot(), listClient)
+    listClientMissing = get_missing_client_list(solution.listTimeSlot, listClient)
 
     # Tri de la liste selon un critère de la méthode orderListOperator
     listClientMissing = methods.order_ListClient_by_ratio(listClientMissing)
-    if not solution.getListTimeSlot():
+    if not solution.listTimeSlot:
         # Ajout du time slot à la solution
         newTimeSlot = get_new_timeSlot(vehicle)
         solution.appendTimeSlot(newTimeSlot)

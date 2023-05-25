@@ -1,7 +1,6 @@
 """
 Source from project ALNS 2022, ALEXI OMAR DJAMA
 """
-from alns.Route import Route
 from alns.TimeSlot import TimeSlot
 import math
 
@@ -75,28 +74,11 @@ class Solution:
         cost = self.distance()
         return cost
 
-    def getListTimeSlot(self):
-        return self.listTimeSlot
-
     def appendTimeSlot(self, timeSlot):
         self.listTimeSlot.append(timeSlot)
 
     def removeTimeSlot(self, timeSlotToRemove):
-        i = 0
-        for timeSlot in self.listTimeSlot:
-            if timeSlot.getIndice() == timeSlotToRemove.getIndice():
-                break
-            i += 1
-        self.listTimeSlot.pop(i)
-
-    def setSingleRouteFromClient(self, listClient, vehicle):
-        self.listTimeSlot = []
-        for client in listClient:
-            timeslot = TimeSlot()
-            route = Route(vehicle)
-            route.appendClient(client)
-            timeslot.appendRoute(route)
-            self.listTimeSlot.append(timeslot)
+        self.listTimeSlot.remove(timeSlotToRemove)
 
     def clone(self, solutionToCopy):
         # Copie des variables
@@ -134,14 +116,14 @@ class Solution:
             # Calcul de Z1
             self.duration += timeSlot.getDuration(self.instance.getDistance)
 
-            for route in timeSlot.getListRoute():
-                if len(route.getTrajet()) > 1:
-                    for indexClient in range(len(route.getTrajet()) - 1):
+            for route in timeSlot.listRoute:
+                if len(route.trajet) > 1:
+                    for indexClient in range(len(route.trajet) - 1):
                         clientArrivee = route.getClientByIndex(indexClient + 1)
 
                         # Calcul de Z2
                         if indexTimeSlot + 1 > 1:
-                            self.requestPriorityPenalty += (math.floor(10 * (clientArrivee.getRatio()))
+                            self.requestPriorityPenalty += (math.floor(10 * (clientArrivee.ratio()))
                                                             * indexTimeSlot) / 10
 
                             # Calcul de Z3
@@ -156,28 +138,27 @@ class Solution:
         cost += Solution.facteurZ3 * self.inventoryPriorityPenalty + Solution.facteurZ4 * nbTimeSlot
         return cost
 
-    def fitness(self, alpha=1, beta=1, gamma=1):
+    def fitness(self, alpha=8, beta=4, gamma=4):
         self.satisfaction = 0
         self.fillRate = 0
         self.usingCost = 0
         self.duration = 0
-        notInRoute = {client.getIndice(): 1 for client in self.instance.listClient}
+        notInRoute = {client.indice: 1 for client in self.instance.listClient}
 
         for timeslot in self.listTimeSlot:
             self.duration += timeslot.getDuration(self.instance.getDistance)
 
-            for route in timeslot.getListRoute():
-                self.fillRate += route.vehicle.getCapacity() / max(1, route.getTotalQuantity())
+            for route in timeslot.listRoute:
+                self.fillRate += route.vehicle.capacity / max(1, route.getTotalQuantity())
                 self.usingCost += route.getVehicleCost(self.instance.getDistance)
 
-                for client in route.getTrajet():
-                    notInRoute[client.getIndice()] = 0
+                for client in route.trajet:
+                    notInRoute[client.indice] = 0
 
             for client in self.instance.listClient:
-                self.satisfaction += client.getPriority() * notInRoute[client.getIndice()]
+                self.satisfaction += client.priority() * notInRoute[client.indice]
 
-        # cost = alpha * self.satisfaction + beta * self.fillRate + gamma * self.usingCost
-        cost = pow(self.satisfaction, 8) + pow(self.fillRate, 4) + pow(self.usingCost, 4)
+        cost = pow(self.satisfaction, alpha) + pow(self.fillRate, beta) + pow(self.usingCost, gamma)
         return cost
 
     def distance(self):
@@ -188,7 +169,7 @@ class Solution:
         return dist
 
     def display(self, name=None):
-        name = self.instance.getName() if name is None else name
+        name = self.instance.name if name is None else name
         print("*** Solution {name} ***".format(name=name))
         print("- Coût minimisé = {cost}".format(cost=self.getCost()))
         print("- Coût de la solution = {c} (= {k1}*{z1} + {k2}*{z2} + {k3}*{z3} + {k4}*{z4})".format(
@@ -201,17 +182,13 @@ class Solution:
             z3=self.inventoryPriorityPenalty,
             k4=Solution.facteurZ4,
             z4=len(self.listTimeSlot)))
-        print("- Fitness = {f} (= alpha*{satisfaction}^8 + beta*{fillRate}^4 + gamma*{usingCost}^4)".format(
+        print("- Fitness = {f} (= {satisfaction}^8 + {fillRate}^4 + {usingCost}^4)".format(
             f=round(self.fitness(), 2),
             satisfaction=round(self.satisfaction, 2),
             fillRate=round(self.fillRate, 2),
             usingCost=round(self.usingCost, 2)))
 
-        dist = 0
-        for timeslot in self.listTimeSlot:
-            for route in timeslot.listRoute:
-                dist += route.getTotalDistance(self.instance.getDistance)
-        print("- Distance = {d}".format(d=dist))
+        print("- Distance = {d}".format(d=self.distance()))
 
         print("Found in {t} / {tt} s".format(t=round(self.foundTime, 2), tt=round(self.totalTime, 2)))
         i = 1

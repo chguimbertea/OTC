@@ -114,7 +114,7 @@ class ALNS:
             moreClientForCapacity = True
 
             # Tant que la capacité du véhicule n'est pas atteinte
-            while route.getTotalQuantity() <= route.vehicle.getCapacity() and moreClientForCapacity:
+            while route.getTotalQuantity() <= route.vehicle.capacity and moreClientForCapacity:
 
                 # Initialisation pour vérifier si un client a été ajouté
                 moreClientForCapacity = False
@@ -122,12 +122,12 @@ class ALNS:
                 # Boucle sur les clients de l'instance
                 for client in listClient:
                     # S'il est non visité, on l'ajoute
-                    if not client.isVisited() and client.getIndice() < 1000:
+                    if not client.isVisited() and client.indice < 1000:
                         route.insertClient(-1, client)
 
                         # Vérification des contraintes de durée du time slot, de capacité du véhicule et d'horaires
                         if timeSlot.getDuration(self.instance.getDistance) <= self.durationTimeSlotMax \
-                                and route.getTotalQuantity() <= route.vehicle.getCapacity() \
+                                and route.getTotalQuantity() <= route.vehicle.capacity \
                                 and route.canPass(self.instance.getDistance):
                             # Si oui alors on valide l'ajout
                             client.setVisited()
@@ -265,7 +265,7 @@ class ALNS:
         currentSolution corresponds to the solution that we modify at each iteration.
         testSolution corresponds to the solution kept in memory to which we will compare current solution.
         """
-        print("Solving " + self.instance.getName())
+        print("Solving " + self.instance.name)
         if not methods.fast_check(self.listClient, self.numberTimeSlotMax, self.routePerTimeSlotMax,
                                   self.durationTimeSlotMax):
             return Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
@@ -275,7 +275,7 @@ class ALNS:
 
         # INITIALISATION DES SOLUTIONS
         self.bestSolution = self.init_solution()
-        if not self.bestSolution.getListTimeSlot():
+        if not self.bestSolution.listTimeSlot:
             if showLog:
                 print("Too many tries, invalid solution")
             return self.bestSolution
@@ -329,7 +329,7 @@ class ALNS:
 
                 # Création d'une nouvelle solution de départ
                 currentSolution = self.init_solution()
-                if not currentSolution.getListTimeSlot():
+                if not currentSolution.listTimeSlot:
                     if showLog:
                         print("Too many tries, invalid solution for reset")
                     return self.bestSolution

@@ -2,7 +2,7 @@ def check_all_visited(listClient, clientToVisit, showLog=False):
     for client in listClient:
         if client in clientToVisit and not client.isVisited():
             if showLog:
-                print("Solution non valide - Client {i} non visité".format(i=client.getIndice()))
+                print("Solution non valide - Client {i} non visité".format(i=client.indice))
 
             # Réinitialisation complète de la liste avant de retourner False
             for clientVisited in listClient:
@@ -10,7 +10,7 @@ def check_all_visited(listClient, clientToVisit, showLog=False):
             return False
         elif client not in clientToVisit and client.isVisited():
             if showLog:
-                print("Solution non valide - Client {i} visité".format(i=client.getIndice()))
+                print("Solution non valide - Client {i} visité".format(i=client.indice))
 
             # Réinitialisation complète de la liste avant de retourner False
             for clientVisited in listClient:
@@ -47,10 +47,10 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
                 print("Solution non valide - Nombre de routes par time slot")
             return False
 
-        for route in timeSlot.getListRoute():
+        for route in timeSlot.listRoute:
             # Si la route courante n'a que 2 clients alors elle ne passe par aucun point de collecte
             # Elle fait 0 → 0
-            size = len(route.getTrajet())
+            size = len(route.trajet)
             if size <= 2:
                 # On peut donc la supprimer
                 timeSlot.removeRoute(route)
@@ -58,19 +58,19 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
                 return check(solution, clientToVisit, showLog, notSommetVisited)
 
             '''Contrainte de démarrer du dépôt'''
-            if route.getTrajet()[0].getIndice() != route.vehicle.depot.getIndice():
+            if route.trajet[0].indice != route.vehicle.depot.indice:
                 if showLog:
                     print("Solution non valide - Début d'une route sans dépôt")
                 return False
 
             '''Contrainte de capacité du véhicule'''
-            if route.getTotalQuantity() > route.vehicle.getCapacity():
+            if route.getTotalQuantity() > route.vehicle.capacity:
                 if showLog:
                     print("Solution non valide - Capacité max du véhicule")
                 return False
 
             '''Contrainte de finir par le dépôt'''
-            if route.getTrajet()[-1].getIndice() != route.vehicle.depot.getIndice():
+            if route.trajet[-1].indice != route.vehicle.depot.indice:
                 if showLog:
                     print("Solution non valide - Fin d'une route sans dépôt")
                 return False
@@ -84,7 +84,7 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
             # Sauf si on spécifie de ne pas vérifier les sommets visités pour les opérateurs de réparation
             if not notSommetVisited:
                 # Validation du passage par le sommet
-                for client in route.getTrajet():
+                for client in route.trajet:
                     client.setVisited()
 
         '''Contrainte de durée du time slot'''
@@ -111,7 +111,7 @@ def quick_check(solution, clientToVisit=None, showLog=False):
                 if showLog:
                     print("Solution non valide - Horaires non respectés")
                 return False
-            for client in route.getTrajet():
+            for client in route.trajet:
                 client.setVisited()
 
     return check_all_visited(solution.instance.listClient, clientToVisit, showLog)

@@ -1,6 +1,7 @@
 from Solver import Solver
 from alns import alnsConvertisseur
 from parser import parse_collecteurs, parse_clients
+from preview import preview
 
 
 def print_route(route):
@@ -38,4 +39,5 @@ if __name__ == "__main__":
     for s in solution.keys():
         print("Collecteur : {n}".format(n=s.nom))
         print_route(solution[s])
+        preview(solution[s], clients)
 

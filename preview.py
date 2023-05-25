@@ -3,7 +3,41 @@ import folium
 RADIUS = 3
 
 
-def preview(solution, filename=None):
+def preview(solution, list_clients=None, filename="routing"):
+    colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
+    routing = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
+
+    # Clients
+    list_clients = [] if list_clients is None else list_clients
+    for client in list_clients:
+        folium.CircleMarker(location=client.localisation.to_tuple(), popup=client.nom, radius=RADIUS).add_to(routing)
+
+    idColor = 0
+    clientsLocation = []
+    depot_is_drawing = False
+    for s in solution:
+        clientsLocation.append(s.localisation.to_tuple())
+        idColor = idColor % len(colors)
+
+        if s.indice > 999:
+            if depot_is_drawing:
+                folium.PolyLine(clientsLocation, color=colors[idColor]).add_to(routing)
+                clientsLocation = []
+                idColor += 1
+            else:
+                folium.Marker(s.localisation.to_tuple(), popup=s.nom,
+                              icon=folium.Icon(icon='warehouse', prefix='fa')).add_to(routing)
+                depot_is_drawing = True
+        else:
+            folium.Marker(s.localisation.to_tuple(), popup=s.nom,
+                          icon=folium.Icon(color=colors[idColor], icon='boxes-stacked', prefix='fa')).add_to(routing)
+
+    name = "{name}.html".format(name=filename)
+    routing.save(name)
+    print(name + " has been saved")
+
+
+def previewSolution(solution, filename=None):
     colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
     routing = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
 
@@ -21,7 +55,7 @@ def preview(solution, filename=None):
 
             # Depot
             depot = route.trajet[0]
-            folium.Marker(depot.localisation.to_tuple(), popup=depot.name,
+            folium.Marker(depot.localisation.to_tuple(), popup=depot.nom,
                           icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(routing)
 
             # Routing
@@ -43,7 +77,7 @@ def preview(solution, filename=None):
 
 
 def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientInside=None, listAllClient=None,
-                      focalPoint=None, filename=None):
+                      focalPoint=None, filename="view"):
     if listConvexHullPoint is None:
         listConvexHullPoint = []
     if listClientInside is None:
@@ -65,17 +99,19 @@ def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientIn
     if focalPoint is not None:
         folium.Marker(focalPoint, popup='focal', icon=folium.Icon(color='black')).add_to(view)
     for point in listAllClient:
-        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=allColor, radius=RADIUS).add_to(view)
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=allColor,
+                            radius=RADIUS).add_to(view)
     for point in listClientInside:
-        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=insideColor, radius=RADIUS).add_to(view)
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=insideColor,
+                            radius=RADIUS).add_to(view)
     for point in listSelectedClient:
-        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=selectedColor, radius=RADIUS).add_to(view)
+        folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.name, color=selectedColor,
+                            radius=RADIUS).add_to(view)
         folium.Marker(point.localisation.to_tuple(), popup=point.indice,
                       icon=folium.Icon(color=selectedColor, icon='boxes-stacked', prefix='fa')).add_to(view)
     if listConvexHullPoint:
         folium.PolyLine(listConvexHullPoint, color=convexHullColor).add_to(view)
 
-    filename = "view" if filename is None else filename
     name = "{name}.html".format(name=filename)
     view.save(name)
     print(name + " has been saved")

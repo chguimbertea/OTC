@@ -8,8 +8,7 @@ def solve(list_client, collecteur):
     new_list_client = list_client
 
     new_list_vehicle = []
-    id_depot = 1000
-    depot = Client(indice=id_depot, localisation=collecteur.localisation,
+    depot = Client(indice=collecteur.indice, localisation=collecteur.localisation,
                    horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
     v = Vehicle(collecteur.vehicule_capacite, collecteur.vehicule_vitesse,
                 collecteur.temps_collecte_fixe, collecteur.temps_collecte_caisse,
@@ -22,14 +21,12 @@ def solve(list_client, collecteur):
     methode = ALNS(instance)
     solution = methode.solve()
 
-    dict_client = {c.indice: c for c in list_client}
-    dict_client[id_depot] = collecteur
     order = []
     for timeSlot in solution.listTimeSlot:
         for route in timeSlot.listRoute:
-            if not order:
-                order.append(dict_client[route.trajet[0].indice])
-            for client in route.trajet[1:]:
-                order.append(dict_client[client.indice])
+            if order and route.trajet[0].indice == order[-1].indice:
+                continue
+            for client in route.trajet:
+                order.append(client)
 
     return order

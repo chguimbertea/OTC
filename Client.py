@@ -18,7 +18,7 @@ class Client:
     def ratio(self):
         return self.quantite / self.capacite
 
-    def priority(self):
+    def priorite(self):
         return (1 + self.requete) * self.ratio()
 
     def isVisited(self):
@@ -37,5 +37,5 @@ class Client:
         print("\tQuantité = {q}".format(q=self.quantite))
         print("\tRequête = {r}".format(r=self.requete))
         print("\tDernier passage = {d}".format(d=self.dernier_passage))
-        print("\tPriorité = {p}".format(p=self.priority()))
+        print("\tPriorité = {p}".format(p=self.priorite()))
         print("\tIndicateur de tri = {v}".format(v=self.indicateurTri))

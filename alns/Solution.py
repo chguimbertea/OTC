@@ -156,7 +156,7 @@ class Solution:
                     notInRoute[client.indice] = 0
 
             for client in self.instance.listClient:
-                self.satisfaction += client.priority() * notInRoute[client.indice]
+                self.satisfaction += client.priorite() * notInRoute[client.indice]
 
         cost = pow(self.satisfaction, alpha) + pow(self.fillRate, beta) + pow(self.usingCost, gamma)
         return cost

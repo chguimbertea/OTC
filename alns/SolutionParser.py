@@ -1,10 +1,14 @@
 import json
+import pandas as pd
+
+from Localisation import Localisation
+from alns.Instance import Instance
 from alns.TimeSlot import TimeSlot
 from alns.Route import Route
 from alns.Vehicle import Vehicle
 from Client import Client
 from alns.Solution import Solution
-from alns.InstanceParser import parse
+from parser import parse_clients
 
 
 def findVehicle(dataVehicle, listVehicle):
@@ -54,8 +58,58 @@ def readTimeSlot(dataTimeSlot, listClient, listVehicle, distFunc):
     return timeSlot
 
 
-def parse_solution(instance, solutionPath):
+def read_depot(df, name, index):
+    adress = df['depotAdress']
+    loc = Localisation()
+    if not loc.from_adress(adress):
+        loc.from_DD(df['depotLatitude'], df['depotLongitude'])
+
+    earliestStart = df['earliestStart']
+    latestEnd = 24 if df['latestEnd'] == 0 else df['latestEnd']
+    hours = [[earliestStart, latestEnd]]
+    return Client(indice=index, localisation=loc, horaires=hours, nom="depot_" + name)
+
+
+def read_vehicle(dfVehicle, index):
+    name = dfVehicle['name']
+    capacity = dfVehicle['capacity']
+    speed = dfVehicle['speed']
+    fct = dfVehicle['fixedCollectionTime']
+    ctc = dfVehicle['collectionTimePerCrate']
+
+    # COST
+
+    fixedCost = dfVehicle['fixedCost']
+    kmCost = dfVehicle['kmCost']
+    crateCost = dfVehicle['crateCost']
+    stopCost = dfVehicle['stopCost']
+
+    # DEPOT
+    depot = read_depot(dfVehicle, name, index)
+
+    return Vehicle(capacity, speed, fct, ctc, depot, fixedCost, kmCost, crateCost, stopCost, name)
+
+
+def read_vehicles(fileName):
+    listVehicle = []
+    dfVehicles = pd.read_json(fileName, orient='records')
+    # if 'fixedCost' not in dfVehicle.index:
+    # dfVehicle['fixedCost'][0] = 0
+    dfVehicles.fillna(0, inplace=True)
+    for index, row in dfVehicles.iterrows():
+        i = index
+        i += 1000
+        listVehicle.append(read_vehicle(row, i))
+    return listVehicle
+
+
+def parse_solution_from_files(clientFilePath, vehicleFilPath, solutionPath):
+    listClient = parse_clients(clientFilePath)
+    listVehicle = read_vehicles(vehicleFilPath)
+
     data = json.load(open(solutionPath))
+    instance = Instance(listClient, listVehicle, data['name'])
+
     nIter = data['nIter']
     ntm = data['number max of timeslot']
     rpt = data['number max of route per timeslot']
@@ -81,10 +135,3 @@ def parse_solution(instance, solutionPath):
         solution.appendTimeSlot(timeSlot)
     solution.cost()
     return solution
-
-
-def parse_solution_from_files(filePath, solutionPath):
-    instance = parse(filePath)
-    # data = json.load(open(solutionPath))
-    # instance = parse(data['name'])
-    return parse_solution(instance, solutionPath)

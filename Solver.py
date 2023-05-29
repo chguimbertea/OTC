@@ -67,7 +67,8 @@ class Solver:
             # inside = md.inside_intersection(orderedList.copy(), hullPoint, focalPoint, residualQuantity)
             # SOIT PROCHE D'UN SEGMENT DE ROUTE
             inside = md.inside_near_points(orderedList.copy(), current_solution, residualQuantity)
-            # previewConvexHull(selectedClient, listAllClient=instance.listClient, filename="view_{i}".format(i=cpt))
+            # previewConvexHull(selectedClient, listAllClient=instance.listClient,
+            #                   filename="view_{i}".format(i=cpt), showLog=True)
 
             # tant que solution valide, on ajoute des points interieurs
             inside.sort(key=lambda x: (x.priorite(), x.capacite), reverse=True)

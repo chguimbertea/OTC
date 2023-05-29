@@ -21,12 +21,12 @@ def solve(list_client, collecteur):
     methode = ALNS(instance)
     solution = methode.solve()
 
-    order = []
+    ordre = []
     for timeSlot in solution.listTimeSlot:
         for route in timeSlot.listRoute:
-            if order and route.trajet[0].indice == order[-1].indice:
+            if ordre and route.trajet[0].indice == ordre[-1].indice:
                 continue
             for client in route.trajet:
-                order.append(client)
+                ordre.append(client)
 
-    return order
+    return ordre

@@ -64,15 +64,9 @@ class Solution:
         self.ns = ns
 
     def getCost(self):
-        """cost = 0
-        for timeslot in self.listTimeSlot:
-            for route in timeslot.listRoute:
-                cost += route.getVehicleCost(self.instance.getDistance)
-        """
-        # cost = self.cost()
-        # cost = self.fitness()
-        cost = self.distance()
-        return cost
+        # return self.cost()
+        # return self.fitness()
+        return self.distance()
 
     def appendTimeSlot(self, timeSlot):
         self.listTimeSlot.append(timeSlot)

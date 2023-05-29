@@ -1,7 +1,10 @@
+import methodes
 from Solver import Solver
+from algoGeneticTournee import algoGenConvertisseur
 from alns import alnsConvertisseur
 from parser import parse_collecteurs, parse_clients
 from preview import preview
+import time
 
 
 def print_route(route):
@@ -12,6 +15,13 @@ def print_route(route):
     for client in route[1:]:
         chemin += " -> {i}".format(i=client.indice)
     print("Chemin : {chemin}".format(chemin=chemin))
+
+
+def value(solution):
+    dist = 0
+    for i in range(len(solution)-1):
+        dist += methodes.distance(solution[i].localisation, solution[i + 1].localisation)
+    return dist
 
 
 def test_medium():
@@ -32,12 +42,24 @@ if __name__ == "__main__":
     for i in [0, 11, 12, 31, 35, 45, 47, 50, 51, 62]:
         selection.append(clients[i])
 
-    solver = Solver(alnsConvertisseur)
-    # solution = solver.solve(selection, collecteur)
-    # print_route(solution)
-    solution = solver.preprocess(clients, collecteurs)
-    for s in solution.keys():
-        print("Collecteur : {n}".format(n=s.nom))
-        print_route(solution[s])
-        preview(solution[s], clients)
+    # SELECTION
+    # solution = solver.preprocess(clients, collecteurs)
+    # for s in solution.keys():
+    #     print("\nCollecteur : {n}".format(n=s.nom))
+    #     print_route(solution[s])
+    #     preview(solution[s], clients)
 
+    # ALNS
+    # solver = Solver(alnsConvertisseur)
+    # ALGO GENETIQUE
+    solver = Solver(algoGenConvertisseur)
+
+    start = time.perf_counter()
+    solution = solver.solve(selection, collecteur)
+
+    print("Temps :", time.perf_counter()-start)
+    print("Distance :", value(solution))
+    print_route(solution)
+    preview(solution)
+
+    print("\nNbr d'appel de distance :", methodes.cpt)

@@ -107,7 +107,7 @@ class Route:
     def canPass(self, distFunction):
         client = self.trajet[0]
         passage = 60 * client.horaires[0][0]
-        allpassage = [passage / 60]
+        # allpassage = [passage / 60]
         for nextClient in self.trajet[1:]:
             dist = distFunction(client.indice, nextClient.indice)
             travelTime = dist / self.vehicle.speed * 60  # min
@@ -118,7 +118,7 @@ class Route:
                 end = 60 * end
                 if deltaTime <= end:
                     passage = max(start, deltaTime)
-                    allpassage.append(passage / 60)
+                    # allpassage.append(passage / 60)
                     canPass = True
                     break
             if not canPass:

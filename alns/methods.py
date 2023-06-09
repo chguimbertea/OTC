@@ -184,7 +184,7 @@ def swap_inter_route(solution, listClient):
                 routes_vides += 1
 
     nRoute = sum([len(i.listRoute) for i in solution.listTimeSlot])
-    if nRoute <= 2 and routes_vides != 0:
+    if nRoute <= 2 or routes_vides != 0:
         return
 
     # Tant qu'on n'a pas fait 10 itérations et (que la solution est incompatible ou que la solution

@@ -17,6 +17,10 @@ class Collecteur:
 
         self.vehicule_capacite = vehicule_capacite
         self.vehicule_vitesse = vehicule_vitesse
+        if 25 < vehicule_vitesse:
+            self.vehicule_type = "car"
+        else:
+            self.vehicule_type = "bike"
         self.temps_collecte_fixe = temps_collecte_fixe
         self.temps_collecte_caisse = temps_collecte_caisse
 

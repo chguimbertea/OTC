@@ -1,6 +1,7 @@
 import methodes as md
 import time
 
+
 class Solver:
     def __init__(self, methode):
         self.methode = methode
@@ -19,9 +20,8 @@ class Solver:
         # FOCAL POINT
         # focalPoint = md.leftmost_client(list_clients)
         # focalPoint = (focalPoint.location[0], focalPoint.location[1]-0.05)
-        cpt = 1
 
-        for collecteur in list_collecteurs:
+        for step, collecteur in enumerate(list_collecteurs):
             # initialisation
             orderedList = list_clients.copy()  # verif avec deepcopy
             orderedList.sort(key=lambda x: (x.priorite(), x.capacite), reverse=True)
@@ -45,13 +45,13 @@ class Solver:
             residualQuantity += currentClient.quantite
             orderedList.append(currentClient)
 
-
             current_solution = self.methode.solve(selectedClient, collecteur)
             found_time = time.perf_counter() - initial_time
             while not current_solution and selectedClient:
                 # on supprime le point le plus loin
-                id = md.farthest_id_client(selectedClient, collecteur.localisation)
-                client = selectedClient.pop(id)
+                indice = md.farthest_id_client(selectedClient, collecteur)
+                selectedClient.pop(indice)
+                # client = selectedClient.pop(indice)
                 # client.request += 1  # pour plus tard
 
                 current_solution = self.methode.solve(selectedClient, collecteur)
@@ -63,7 +63,7 @@ class Solver:
 
             # RECHERCHE DE POINTS SUPPLÉMENTAIRES POTENTIELS
             # SOIT À L'INTÉRIEUR DE L'ENVELOPPE CONVEXE
-            # hullPoint = md.convexHull(selectedClient.copy())
+            # hullPoint = md.convexHull(selectedClient.copy(), collecteur.vehicule_type)
             # inside = md.inside_intersection(orderedList.copy(), hullPoint, focalPoint, residualQuantity)
             # SOIT PROCHE D'UN SEGMENT DE ROUTE
             inside = md.inside_near_points(orderedList.copy(), current_solution, residualQuantity)
@@ -105,9 +105,7 @@ class Solver:
                 best_value = current_value
                 best_found_time = found_time
 
-            print("End of vehicle routing {i} : {t}".format(i=cpt, t=time.perf_counter() - initial_time))
-            #preview(current_solution, "step{i}".format(i=cpt))
-            cpt += 1
+            print("End of vehicle routing {i} : {t}".format(i=step, t=time.perf_counter() - initial_time))
 
         print("Solution trouvé en {t} / {tt} s".format(t=round(best_found_time, 2),
                                                        tt=round(time.perf_counter() - initial_time, 2)))

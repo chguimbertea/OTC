@@ -1,9 +1,12 @@
+import webbrowser
+
 import folium
+from methodes import get_path_details
 
 RADIUS = 3
 
 
-def preview(solution, list_clients=None, filename="routing"):
+def preview(solution, collecteur, list_clients=None, filename="routing"):
     colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
     routing = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
 
@@ -16,10 +19,16 @@ def preview(solution, list_clients=None, filename="routing"):
     clientsLocation = []
     depot_is_drawing = False
     for s in solution:
-        clientsLocation.append(s.localisation.to_tuple())
+        if not clientsLocation:
+            clientsLocation.append(s.localisation.to_tuple())
+        else:
+            start = clientsLocation.pop()
+            clientsLocation += get_path_details(start[0], start[1], s.localisation.lat, s.localisation.lon,
+                                                collecteur.vehicule_type)
+
         idColor = idColor % len(colors)
 
-        if s.indice > 999:
+        if s.indice == collecteur.indice:
             if depot_is_drawing:
                 folium.PolyLine(clientsLocation, color=colors[idColor]).add_to(routing)
                 clientsLocation = []
@@ -35,6 +44,7 @@ def preview(solution, list_clients=None, filename="routing"):
     name = "{name}.html".format(name=filename)
     routing.save(name)
     print(name + " has been saved")
+    webbrowser.open('file:///home/chloe/PycharmProjects/optimisationTournee/' + name)
 
 
 def previewSolution(solution, filename=None):

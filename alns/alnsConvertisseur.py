@@ -6,20 +6,17 @@ from alns.Vehicle import Vehicle
 
 def solve(list_client, collecteur):
     new_list_client = list_client
-
-    new_list_vehicle = []
     depot = Client(indice=collecteur.indice, localisation=collecteur.localisation,
                    horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
-    v = Vehicle(collecteur.vehicule_capacite, collecteur.vehicule_vitesse,
-                collecteur.temps_collecte_fixe, collecteur.temps_collecte_caisse,
-                depot,
-                collecteur.cout_fixe, collecteur.cout_km, collecteur.cout_caisse, collecteur.cout_stop,
-                collecteur.nom)
-    new_list_vehicle.append(v)
+    vehicle = Vehicle(collecteur.vehicule_capacite, collecteur.vehicule_vitesse,
+                      collecteur.temps_collecte_fixe, collecteur.temps_collecte_caisse,
+                      depot,
+                      collecteur.cout_fixe, collecteur.cout_km, collecteur.cout_caisse, collecteur.cout_stop,
+                      collecteur.vehicule_type, collecteur.nom)
 
-    instance = Instance(new_list_client, new_list_vehicle)
+    instance = Instance(new_list_client, vehicle)
     methode = ALNS(instance)
-    solution = methode.solve()
+    solution = methode.solve(withSwap=False)
 
     ordre = []
     for timeSlot in solution.listTimeSlot:

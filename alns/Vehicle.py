@@ -1,9 +1,10 @@
 
 class Vehicle:
     def __init__(self, capacity, speed, fixedCollectionTime, collectionTimePerCrate, depot,
-                 fixedCost=0, kmCost=0, crateCost=0, stopCost=0, name="truck"):
+                 fixedCost=0, kmCost=0, crateCost=0, stopCost=0, typeV="car", name="truck"):
         self.name = name
         self.depot = depot
+        self.type = typeV
         self.capacity = capacity
         self.speed = speed  # km/h
         self.fixedCollectionTime = fixedCollectionTime

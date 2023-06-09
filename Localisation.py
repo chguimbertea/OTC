@@ -30,6 +30,9 @@ class Localisation:
     def to_string(self):
         return "({lat}, {lon})".format(lat=self.lat, lon=self.lon)
 
+    def to_url(self):
+        return "{lat},{lon}".format(lat=self.lat, lon=self.lon)
+
     def display(self):
         print("Latitude : {lat}".format(lat=self.lat))
         print("Longitude : {lon}".format(lon=self.lon))

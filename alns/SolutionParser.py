@@ -85,30 +85,26 @@ def read_vehicle(dfVehicle, index):
     stopCost = dfVehicle['stopCost']
 
     # DEPOT
-    depot = read_depot(dfVehicle, name, index)
+    depot = read_depot(dfVehicle, name, 1000 + index)
 
     return Vehicle(capacity, speed, fct, ctc, depot, fixedCost, kmCost, crateCost, stopCost, name)
 
 
 def read_vehicles(fileName):
-    listVehicle = []
     dfVehicles = pd.read_json(fileName, orient='records')
     # if 'fixedCost' not in dfVehicle.index:
     # dfVehicle['fixedCost'][0] = 0
     dfVehicles.fillna(0, inplace=True)
     for index, row in dfVehicles.iterrows():
-        i = index
-        i += 1000
-        listVehicle.append(read_vehicle(row, i))
-    return listVehicle
+        return read_vehicle(row, index)
 
 
 def parse_solution_from_files(clientFilePath, vehicleFilPath, solutionPath):
     listClient = parse_clients(clientFilePath)
-    listVehicle = read_vehicles(vehicleFilPath)
+    vehicle = read_vehicles(vehicleFilPath)
 
     data = json.load(open(solutionPath))
-    instance = Instance(listClient, listVehicle, data['name'])
+    instance = Instance(listClient, vehicle, data['name'])
 
     nIter = data['nIter']
     ntm = data['number max of timeslot']
@@ -131,7 +127,7 @@ def parse_solution_from_files(clientFilePath, vehicleFilPath, solutionPath):
     solution.setTime(foundTime, totalTime)
 
     for dataTimeSlot in data['routing']:
-        timeSlot = readTimeSlot(dataTimeSlot, instance.listClient, instance.listVehicle, instance.getDistance)
+        timeSlot = readTimeSlot(dataTimeSlot, instance.listClient, instance.vehicle, instance.getDistance)
         solution.appendTimeSlot(timeSlot)
     solution.cost()
     return solution

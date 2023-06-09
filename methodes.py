@@ -1,13 +1,36 @@
 import math
+import requests
 import geopy.distance as gd
 
 cpt = 0
 
 
-def distance(locI, locJ):
+def distance(locI, locJ, mode):
     global cpt
     cpt += 1
-    return gd.geodesic(locI.to_tuple(), locJ.to_tuple()).km
+    # return gd.geodesic(locI.to_tuple(), locJ.to_tuple()).km
+    r = requests.get("https://graphhopper.com/api/1/route?point=" + locI.to_url() + "&point=" + locJ.to_url()
+                     + "&profile=" + mode + "&locale=en&calc_points=false&key=98a66451-2b12-40a8-915b-210343f0d11c")
+    if r.status_code == 200:
+        return r.json()['paths'][0]['distance'] / 1000  # km
+    else:
+        print("Status : ", r.status_code)
+        raise Exception(r.json()['message'])
+
+
+def get_path_details(startLat, startLon, endLat, endLon, mode):
+    r = requests.get("https://graphhopper.com/api/1/route?point=" + str(startLat) + "," + str(startLon)
+                     + "&point=" + str(endLat) + "," + str(endLon) + "&profile=" + mode
+                     + "&locale=en&calc_points=true&points_encoded=false&key=98a66451-2b12-40a8-915b-210343f0d11c")
+    if r.status_code == 200:
+        line = r.json()['paths'][0]['points']['coordinates']
+        route = []
+        for l in line:
+            route.append((l[1], l[0]))
+        return route
+    else:
+        print("Status : ", r.status_code)
+        raise Exception(r.json()['message'])
 
 
 def fitness(solution, collecteur, list_client):
@@ -26,7 +49,7 @@ def fitness(solution, collecteur, list_client):
         quantiteTotale += clientArrivee.quantite
 
         # DISTANCE
-        dist = distance(clientDepart.localisation, clientArrivee.localisation)
+        dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
         distanceTotale += dist
 
         # DUREE en min
@@ -53,11 +76,11 @@ def fitness(solution, collecteur, list_client):
     return pow(satisfaction, 8) + pow(remplissage, 4) + pow(cout, 4)
 
 
-def farthest_id_client(listClient, centerLoc):
+def farthest_id_client(listClient, collecteur):
     maxIdClient = -1
     maxDist = 0
     for client in listClient:
-        dist = distance(centerLoc, client.localisation)
+        dist = distance(collecteur.localisation, client.localisation, collecteur.vehicule_type)
         if dist > maxDist:
             maxIdClient = client.indice
             maxDist = dist
@@ -89,22 +112,22 @@ def pseudo_angle(A, B, C):
     return determinant(u, v)
 
 
-def compare(A, B, C):
+def compare(A, B, C, mode):
     t = pseudo_angle(A.localisation.to_tuple(), B.localisation.to_tuple(), C.localisation.to_tuple())
     if t > 0:
         return True
     elif t < 0:
         return False
     else:
-        return distance(A.localisation, B.localisation) <= distance(A.localisation, C.localisation)
+        return distance(A.localisation, B.localisation, mode) <= distance(A.localisation, C.localisation, mode)
 
 
-def convexHull(listClient):
+def convexHull(listClient, mode):
     clientHull = [leftmost_client(listClient)]
 
     candidat = listClient[0]
     for client in listClient:
-        if compare(clientHull[-1], candidat, client):
+        if compare(clientHull[-1], candidat, client, mode):
             candidat = client
     clientHull.append(candidat)
     listClient.remove(clientHull[-1])
@@ -112,7 +135,7 @@ def convexHull(listClient):
     while clientHull[-1] != clientHull[0] and listClient:
         candidat = listClient[0]
         for client in listClient:
-            if compare(clientHull[-1], candidat, client):
+            if compare(clientHull[-1], candidat, client, mode):
                 candidat = client
         clientHull.append(candidat)
         listClient.remove(clientHull[-1])

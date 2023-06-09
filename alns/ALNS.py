@@ -24,7 +24,7 @@ class ALNS:
         # Initialisation de l'instance
         self.instance = instance
         self.listClient = instance.listClient if listClient is None else listClient
-        self.vehicle = instance.listVehicle[0] if vehicle is None else vehicle
+        self.vehicle = instance.vehicle if vehicle is None else vehicle
 
         self.numberTimeSlotMax = numberTimeSlotMax
         self.routePerTimeSlotMax = len(self.listClient) if routePerTimeSlotMax is None else routePerTimeSlotMax

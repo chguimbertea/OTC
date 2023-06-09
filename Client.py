@@ -32,6 +32,7 @@ class Client:
 
     def display(self):
         print("- Client = {c} : {nom}".format(c=self.indice, nom=self.nom))
+        print("\tLieu : {l}".format(l=self.localisation.to_tuple()))
         print("\tHoraires : {hours}".format(hours=self.horaires))
         print("\tCapacité = {c}".format(c=self.capacite))
         print("\tQuantité = {q}".format(q=self.quantite))

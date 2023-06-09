@@ -16,6 +16,7 @@ nbPopulation = 1000
 piscine = []
 collecteur = None
 matingpool = []
+dict_distance = None
 
 
 def map(value, istart, istop, ostart, ostop):
@@ -23,7 +24,7 @@ def map(value, istart, istop, ostart, ostop):
 
 
 def setup(list_client, mycollecteur):
-    global pointsDePassage, piscine, collecteur
+    global pointsDePassage, piscine, collecteur, dict_distance
     pointsDePassage = list_client
     collecteur = mycollecteur
     for i in range(0, nbPopulation):
@@ -32,20 +33,25 @@ def setup(list_client, mycollecteur):
         dna = Dna(s)
         piscine.append(dna)
 
+    tmp_list_point = list_client.copy()
+    tmp_list_point.append(mycollecteur)
+    dict_distance = {(i.indice, j.indice): distance(i.localisation, j.localisation, mycollecteur.vehicule_type)
+                     for i in tmp_list_point for j in tmp_list_point}
+
 
 def checkSolution(solution):
     global collecteur
 
-    previousClient = pointsDePassage[solution.gene[0]]
+    previousClient = pointsDePassage[solution[0]]
     passage = 60 * previousClient.horaires[0][0]
-    for s in solution.gene[1:]:
-        dist = distance(previousClient.localisation, pointsDePassage[solution.gene[s]].localisation)
+    for s in solution[1:]:
+        dist = dict_distance[previousClient.indice, pointsDePassage[solution[s]].indice]
         travelTime = dist / collecteur.vehicule_vitesse * 60  # min
         collectionTime = collecteur.temps_collecte_fixe \
-                         + collecteur.temps_collecte_caisse * pointsDePassage[solution.gene[s]].quantite
+                         + collecteur.temps_collecte_caisse * pointsDePassage[solution[s]].quantite
         delta = passage + collectionTime + travelTime
         canPass = False
-        for start, end in pointsDePassage[solution.gene[s]].horaires:
+        for start, end in pointsDePassage[solution[s]].horaires:
             start = 60 * start
             end = 60 * end
             if delta <= end:
@@ -53,31 +59,29 @@ def checkSolution(solution):
                 canPass = True
                 break
         if not canPass:
-            return 1000  # 1?
-        previousClient = pointsDePassage[solution.gene[s]]
+            return 1000
+        previousClient = pointsDePassage[solution[s]]
 
-    return 1  # 1000?
+    return 1
 
 
 def calculFitness(solution):
     if not pointsDePassage:
-        dist = 0
+        return 0
     else:
-        dist = distance(collecteur.localisation, pointsDePassage[solution.gene[0]].localisation)
-        for i in range(0, len(solution.gene) - 1):
-            dist += distance(pointsDePassage[solution.gene[i]].localisation,
-                             pointsDePassage[solution.gene[i + 1]].localisation)
-        dist += distance(pointsDePassage[solution.gene[-1]].localisation, collecteur.localisation)
+        dist = dict_distance[collecteur.indice, pointsDePassage[solution[0]].indice]
+        for i in range(0, len(solution) - 1):
+            dist += dict_distance[pointsDePassage[solution[i]].indice, pointsDePassage[solution[i + 1]].indice]
+        dist += dict_distance[pointsDePassage[solution[-1]].indice, collecteur.indice]
         dist = dist * 1000  # m
-
-    solution.fitness = dist * checkSolution(solution)
+        return dist * checkSolution(solution)
 
 
 def evaluation():
     global piscine, bestSolution, matingpool, bestFitness
 
     for p in piscine:
-        calculFitness(p)
+        p.fitness = calculFitness(p.gene)
 
     indexBest = -1
     minfit = piscine[0].fitness
@@ -114,7 +118,7 @@ def selection():
         parentB = copy.deepcopy(matingpool[random.randint(0, len(matingpool) - 1)])
         child = parentA.crossover(parentB)
         newPath = Dna(child)
-        newPath.mutation(0.1) #!!
+        newPath.mutation(0.1)  # !!
         newPopulation.append(newPath)
 
     piscine = copy.deepcopy(newPopulation)
@@ -150,7 +154,10 @@ def to_xy(point, r, cos_phi_0):
 
 
 def getBestSolution():
-    #depot = Client(indice=collecteur.indice, localisation=collecteur.localisation, horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
+    # depot = Client(indice=collecteur.indice, localisation=collecteur.localisation,
+    #                horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
+    if checkSolution(bestSolution) != 1:
+        return []
     solution = [collecteur]
     for s in bestSolution:
         solution.append(pointsDePassage[s])

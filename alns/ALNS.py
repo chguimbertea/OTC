@@ -250,8 +250,8 @@ class ALNS:
             cpt += 1
         return Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
 
-    def solve(self, PU=100, rho=0.3, sigma1=130, sigma2=70, sigma3=25, tolerance=0.1, C=0.9995, Nc=2000,
-              theta=0.5, Ns=10, withSwap=False, showLog=False):
+    def solve(self, pu=100, rho=0.3, sigma1=135, sigma2=70, sigma3=25, tolerance=0.1, coolingRate=0.9995, nc=2000,
+              dMax=0.2, theta=0.5, nbSwap=10, withSwap=False, showLog=False):
         """
         FR:
         Fonction principale. Les différentes parties sont représentées dans le logigramme ou le pseudo code du rapport.
@@ -286,7 +286,7 @@ class ALNS:
         # INITIALISATION DES VARIABLES
         T0 = (tolerance * self.bestSolution.getCost()) / math.log(2)  # temperature initiale
         nbIteration = 0  # nombre d'itérations
-        iterationMaxSinceLastBest = Nc  # nombre d'itérations maximum avant de réinitialiser la solution
+        iterationMaxSinceLastBest = nc  # nombre d'itérations maximum avant de réinitialiser la solution
         nbIterationSinceLastBest = 0  # nombre d'itérations avant de réinitialiser la solution
         self.onremontelapente = 0  # nombre de fois que l'on accepte une solution moins bonne
         self.evolution_iter_best = [nbIteration]  # iterations où on améliore la meilleure solution
@@ -338,13 +338,11 @@ class ALNS:
                     testSolution.clone(currentSolution)
 
             # CHOIX D'UN OPÉRATEUR DE DESTRUCTION
-            # Degré de destruction faible pour détruire peu → améliore le temps de calcul
+            # 0.2 : Degré de destruction faible pour détruire peu → améliore le temps de calcul
+            # 0.4 : Degré de destruction fort pour détruire plus de clients
+            #        → allonge le temps de calcul,pu mais diversifie les solutions
             degree_destruction = random.randint(math.ceil(0.1 * len(self.listClient)),
-                                                math.ceil(0.2 * len(self.listClient)))
-            # Degré de destruction fort pour détruire plus de clients
-            # → allonge le temps de calcul mais diversifie les solutions
-            # degree_destruction = random.randint(math.ceil(0.1*len(self.listClient)),
-            #                                     math.ceil(0.4*len(self.listClient)))
+                                                math.ceil(dMax * len(self.listClient)))
 
             destroy_method = methods.choose_destroy_method(self.destroy_methods, self.weights_destroy)
 
@@ -368,7 +366,7 @@ class ALNS:
             # ATTEINT-ON LA CONDITION POUR FAIRE LES SWAPS ?
             if withSwap and currentSolution.getCost() < (1 + theta) * testSolution.getCost():
                 # ON REALISE Ns SWAPS DE CHAQUE TYPE : 'swap_inter_route' & 'swap_intra_route'
-                for k in range(Ns):
+                for k in range(nbSwap):
                     # SWAP de deux clients au sein d'une route
                     methods.swap_inter_route(currentSolution, self.listClient)
 
@@ -392,7 +390,7 @@ class ALNS:
             # methods.acceptance_criteria_simulated_annealing(T0,alpha,nbIteration)
             # methods.acceptance_criteria_greedy(currentSolution, testSolution)
 
-            if methods.acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, C, nbIteration,
+            if methods.acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, coolingRate, nbIteration,
                                                                self.onremontelapente):
                 # la solution courante est acceptée par le critère d'acceptance donc on la sauvegarde
                 testSolution.clone(currentSolution)
@@ -426,7 +424,7 @@ class ALNS:
             nbIterationSinceLastBest += 1
 
             # Si on a atteint Pu itérations → changements des probabilités associées à chaque méthode
-            if nbIteration % PU == 0:
+            if nbIteration % pu == 0:
                 self.weights_destroy, self.weights_repair = methods.update_weights(rho, self.weights_destroy,
                                                                                    self.weights_repair, Success_destroy,
                                                                                    Success_repair, Used_destroy_methods,
@@ -446,7 +444,7 @@ class ALNS:
                 self.onremontelapente = 0
 
         self.bestSolution.setTime(self.evolution_time_best[-1], round(time.perf_counter() - initialTime, 3))
-        self.bestSolution.setParameters(self.nIter, PU, rho, sigma1, sigma2, sigma3, tolerance, C, Nc, theta, Ns)
+        self.bestSolution.setParameters(self.nIter, pu, rho, sigma1, sigma2, sigma3, tolerance, coolingRate, nc, theta, nbSwap)
 
         if showLog:
             print("Cost = {cost}".format(cost=self.bestSolution.cost()))

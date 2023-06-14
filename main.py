@@ -1,7 +1,3 @@
-import webbrowser
-
-import folium
-
 import methodes
 from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur

@@ -2,20 +2,24 @@ import math
 import requests
 import geopy.distance as gd
 
+key = "98a66451-2b12-40a8-915b-210343f0d11c"
 cpt = 0
 
 
 def distance(locI, locJ, mode):
-    global cpt
+    global cpt, key
     cpt += 1
-    # return gd.geodesic(locI.to_tuple(), locJ.to_tuple()).km
-    r = requests.get("https://graphhopper.com/api/1/route?point=" + locI.to_url() + "&point=" + locJ.to_url()
-                     + "&profile=" + mode + "&locale=en&calc_points=false&key=98a66451-2b12-40a8-915b-210343f0d11c")
-    if r.status_code == 200:
-        return r.json()['paths'][0]['distance'] / 1000  # km
+    key = None  # !!
+    if key:
+        r = requests.get("https://graphhopper.com/api/1/route?point=" + locI.to_url() + "&point=" + locJ.to_url()
+                         + "&profile=" + mode + "&locale=en&calc_points=false&key=" + key)
+        if r.status_code == 200:
+            return r.json()['paths'][0]['distance'] / 1000  # km
+        else:
+            print("Status : ", r.status_code)
+            raise Exception(r.json()['message'])
     else:
-        print("Status : ", r.status_code)
-        raise Exception(r.json()['message'])
+        return gd.geodesic(locI.to_tuple(), locJ.to_tuple()).km
 
 
 def get_path_details(startLat, startLon, endLat, endLon, mode):

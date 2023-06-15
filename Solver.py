@@ -113,5 +113,5 @@ class Solver:
         selection[best_collecteur] = best_solution
         return selection
 
-    def solve(self, list_client, collecteur):
-        return self.methode.solve(list_client, collecteur)
+    def solve(self, list_client, collecteur, showLog=False):
+        return self.methode.solve(list_client, collecteur, showLog)

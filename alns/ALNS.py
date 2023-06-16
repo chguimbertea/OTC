@@ -265,7 +265,8 @@ class ALNS:
         currentSolution corresponds to the solution that we modify at each iteration.
         testSolution corresponds to the solution kept in memory to which we will compare current solution.
         """
-        print("Solving " + self.instance.name)
+        if showLog:
+            print("Solving " + self.instance.name)
         if not methods.fast_check(self.listClient, self.numberTimeSlotMax, self.routePerTimeSlotMax,
                                   self.durationTimeSlotMax):
             return Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
@@ -390,7 +391,8 @@ class ALNS:
             # methods.acceptance_criteria_simulated_annealing(T0,alpha,nbIteration)
             # methods.acceptance_criteria_greedy(currentSolution, testSolution)
 
-            if methods.acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, coolingRate, nbIteration,
+            if methods.acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, coolingRate,
+                                                               nbIteration,
                                                                self.onremontelapente):
                 # la solution courante est acceptée par le critère d'acceptance donc on la sauvegarde
                 testSolution.clone(currentSolution)
@@ -444,7 +446,8 @@ class ALNS:
                 self.onremontelapente = 0
 
         self.bestSolution.setTime(self.evolution_time_best[-1], round(time.perf_counter() - initialTime, 3))
-        self.bestSolution.setParameters(self.nIter, pu, rho, sigma1, sigma2, sigma3, tolerance, coolingRate, nc, theta, nbSwap)
+        self.bestSolution.setParameters(self.nIter, pu, rho, sigma1, sigma2, sigma3, tolerance, coolingRate, nc, theta,
+                                        nbSwap)
 
         if showLog:
             print("Cost = {cost}".format(cost=self.bestSolution.cost()))

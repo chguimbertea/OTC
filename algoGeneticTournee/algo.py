@@ -10,7 +10,7 @@ from preview import previewConvexHull
 runing = False
 pointsDePassage = []
 bestSolution = []
-bestFitness = 900000000
+bestFitness = 999999999
 nbGeneration = 2000
 nbPopulation = 1000
 piscine = []
@@ -73,8 +73,8 @@ def calculFitness(solution):
         for i in range(0, len(solution) - 1):
             dist += dict_distance[pointsDePassage[solution[i]].indice, pointsDePassage[solution[i + 1]].indice]
         dist += dict_distance[pointsDePassage[solution[-1]].indice, collecteur.indice]
-        dist = dist * 1000  # m
-        return dist * checkSolution(solution)
+        dist = dist # * 1000  # m
+        return pow(dist * checkSolution(solution), 4)
 
 
 def evaluation():
@@ -124,27 +124,28 @@ def selection():
     piscine = copy.deepcopy(newPopulation)
 
 
-def run():
+def run(showLog=False):
     global runing
 
     evaluation()
     selection()
 
-    print(bestFitness, ': ', bestSolution)
+    if showLog:
+        print(bestFitness, ': ', bestSolution)
 
-    listC = []
-    listLocation = [collecteur.localisation.to_tuple()]
-    for p in bestSolution:
-        listLocation.append(pointsDePassage[p].localisation.to_tuple())
-        listC.append(pointsDePassage[p])
-    listLocation.append(collecteur.localisation.to_tuple())
+        listC = []
+        listLocation = [collecteur.localisation.to_tuple()]
+        for p in bestSolution:
+            listLocation.append(pointsDePassage[p].localisation.to_tuple())
+            listC.append(pointsDePassage[p])
+        listLocation.append(collecteur.localisation.to_tuple())
 
-    previewConvexHull(listC, listLocation)
+        previewConvexHull(listC, listLocation)
 
-    if runing == False:
-        # webbrowser.open('http://localhost:63342/rebooteille-DISP-AG/algoGeneticTournee/view.html?_ijt=oe6565he8bdsv396es0mmdgfjr&_ij_reload=RELOAD_ON_SAVE')  # Go to example.com
-        webbrowser.open('file:///home/chloe/PycharmProjects/optimisationTournee/view.html')
-        runing = True
+        if runing == False:
+            # webbrowser.open('http://localhost:63342/rebooteille-DISP-AG/algoGeneticTournee/view.html?_ijt=oe6565he8bdsv396es0mmdgfjr&_ij_reload=RELOAD_ON_SAVE')  # Go to example.com
+            webbrowser.open('file:///home/chloe/PycharmProjects/optimisationTournee/view.html')
+            runing = True
 
 
 def to_xy(point, r, cos_phi_0):

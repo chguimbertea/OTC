@@ -3,8 +3,9 @@
 
 ## TODO
 - [x] Bloc ALNS
-- [x] Bloc Algo genetique
-- [ ] Bloc optimisation de tournée de GraphHopper
+- [x] Bloc Algo génétique
+- [x] Bloc optimisation de tournée de GraphHopper
+- [x] Script pour comparaison
 - [ ] Bloc Selection
 - [ ] chercher une librairie pour la localisation
 - [ ] chercher une librairie pour les horaires d'ouverture

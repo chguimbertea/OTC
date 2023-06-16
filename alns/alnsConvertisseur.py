@@ -4,7 +4,7 @@ from alns.Instance import Instance
 from alns.Vehicle import Vehicle
 
 
-def solve(list_client, collecteur):
+def solve(list_client, collecteur, showLog=False):
     new_list_client = list_client
     depot = Client(indice=collecteur.indice, localisation=collecteur.localisation,
                    horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
@@ -16,7 +16,7 @@ def solve(list_client, collecteur):
 
     instance = Instance(new_list_client, vehicle)
     methode = ALNS(instance)
-    solution = methode.solve(withSwap=False)
+    solution = methode.solve(withSwap=False, showLog=showLog)
 
     ordre = []
     for timeSlot in solution.listTimeSlot:

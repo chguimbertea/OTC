@@ -15,7 +15,7 @@ def setup(method, pop_size=10):
     memory('alns', method)
     memory('parametres', [])
     memory('file', open("./algoGeneticAlns/gene.csv", "w+"))
-    memory('file').write('tau;c;theta;Ns;Fitness\n')
+    memory('file').write('rho;dmax;theta;Ns;Fitness\n')
     memory("metaParametres", [])
     memory("metaParametresNb", 4)  # !!!
     memory("metaParametresHistorique", [])
@@ -54,8 +54,10 @@ def calculateFitness(gene):
     for i in range(5):
         solution = memory("alns").solve(rho=gene[0], dMax=gene[1], theta=gene[2], nbSwap=gene[3], withSwap=True)
         meanCost += solution.getCost()
-        meanTime += solution.foundTime / solution.totalTime
-    return (meanCost + meanTime) / 5
+        meanTime += solution.totalTime
+        # print("cost :", solution.getCost(), "\ttime :", solution.foundTime, "/", solution.totalTime)
+    # print("fitness :", pow(meanCost, 4), "+", pow(meanTime, 4))
+    return pow(meanCost, 4) + pow(meanTime, 4)
 
 
 def evaluate():
@@ -76,6 +78,7 @@ def evaluate():
 
     if indexBest >= 0:
         memory("bestMetaParametres", memory("population")[indexBest].gene)
+        memory("bestFitness", memory("population")[indexBest].fitness)
         memory("metaParametresHistorique").append(memory("population")[indexBest].gene)
         memory('file').write(str(memory("population")[indexBest].gene[0]) + ";")
         memory('file').write(str(memory("population")[indexBest].gene[1]) + ";")
@@ -88,7 +91,6 @@ def evaluate():
             f = 0.5
         else:
             f = map(p.fitness, minfit, maxfit, 1, 0)
-        print(p.fitness, ' ', f)
         p.fitness = f
 
     memory("matingpool", [])
@@ -145,6 +147,8 @@ def displaySolution():
 def run():
     evaluate()
     selection()
+
+    print(memory("bestFitness"), ':', memory("bestMetaParametres"))
 
     # displaySolution()
     print("meta", memory("metaParametresHistorique"))

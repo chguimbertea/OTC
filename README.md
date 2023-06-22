@@ -1,11 +1,12 @@
-# Optimisation de Tournee de Collecte 
+# Optimisation de Tournée de Collecte 
 **Statut** : en développement
 
 ## TODO
-- [x] Bloc ALNS
-- [x] Bloc Algo génétique
-- [x] Bloc optimisation de tournée de GraphHopper
+- [x] ALNS
+- [x] Algorithme génétique
+- [x] Utilisation de l'API optimisation de tournée de GraphHopper
+- [x] Modèle linéaire
 - [x] Script pour comparaison
-- [ ] Bloc Selection
-- [ ] chercher une librairie pour la localisation
-- [ ] chercher une librairie pour les horaires d'ouverture
+- [ ] Méthode de sélection des points
+- [ ] librairie pour la localisation
+- [ ] librairie pour les horaires

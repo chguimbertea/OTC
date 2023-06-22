@@ -1,9 +1,9 @@
-import VRPTWmip
 import methodes
-import routeOptimization
 from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur
 from alns import alnsConvertisseur
+from apiRO import routeOptimization
+from modeleVRPTW import VRPTWmip
 from parser import parse_collecteurs, parse_clients
 import time
 

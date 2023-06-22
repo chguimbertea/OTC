@@ -1,5 +1,6 @@
+import VRPTWmip
 import methodes
-import routeOptimizationConvertisseur
+import routeOptimization
 from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur
 from alns import alnsConvertisseur
@@ -31,26 +32,26 @@ if __name__ == "__main__":
     # SOLVERS
     solverAlns = Solver(alnsConvertisseur)
     solverGen = Solver(algoGenConvertisseur)
-    solverAPI = Solver(routeOptimizationConvertisseur)
+    solverAPI = Solver(routeOptimization)
+    solverMip = Solver(VRPTWmip)
 
-    list_solvers = [solverAlns, solverGen, solverAPI]
-    list_noms = ["ALNS", "AlgoGen", "RO_API"]
+    solvers = [solverAlns, solverGen, solverAPI, solverMip]
+    noms = ["ALNS", "AlgoGen", "RO_API", "MIP"]
+
+    list_solvers = []
+    list_noms = []
+    for i in [0, 1]:
+        list_solvers.append(solvers[i])
+        list_noms.append(noms[i])
+
     nbr = str(len(selection))
 
-    for i, s in enumerate(list_solvers):
-        print("Solving", instance, "with", list_noms[i])
-        dist_moy = 0
-        tps_moy = 0
-
-        for j in range(10):
+    for j in range(10):
+        for i, s in enumerate(list_solvers):
+            print("Solving", instance, "with", list_noms[i])
             start = time.perf_counter()
             solution = s.solve(selection, collecteur)
             tps = time.perf_counter() - start
-            dist = value(solution, collecteur.vehicule_type)
-            file.write(instance + ";" + nbr + ";" + list_noms[i] + ";" + str(dist) + ";" + str(tps) + "\n")
-
-            dist_moy += dist
-            tps_moy += tps
-
-        print("Distance :", dist_moy/10)
-        print("Temps :", tps_moy/10)
+            distance = value(solution, collecteur.vehicule_type)
+            file.write(instance + ";" + nbr + ";" + list_noms[i] + ";" + str(distance) + ";" + str(tps) + "\n")
+        #time.sleep(30)

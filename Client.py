@@ -11,7 +11,7 @@ class Client:
         self.capacite = capacite
         self.requete = requete
         self.dernier_passage = dernier_passage  # Timestamp ?
-        self.horaires = [[0, 24]] if horaires is None else horaires
+        self.horaires = [[0, 24]] if horaires is None else horaires  # h
         self.indicateurTri = 1
         self.visite = False
 

@@ -1,5 +1,6 @@
 import methodes
-import routeOptimizationConvertisseur
+import VRPTWmip
+import routeOptimization
 from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur
 from alns import alnsConvertisseur
@@ -40,15 +41,20 @@ if __name__ == "__main__":
 
     collecteur = collecteurs[0]
     selection = []
-    for i in [0, 11, 12, 31, 35, 45, 47, 50, 51, 62]:
+    # l = [0, 11, 12, 31, 35, 45, 47, 50, 51, 62]
+    l = [0, 11, 35, 47, 50]
+    for i in l:
         selection.append(clients[i])
 
     # ALNS
-    # solver = Solver(alnsConvertisseur)
+    # methode = alnsConvertisseur
     # ALGO GENETIQUE
-    # solver = Solver(algoGenConvertisseur)
+    # methode = algoGenConvertisseur
     # ROUTE OPTIMIZATION API
-    solver = Solver(routeOptimizationConvertisseur)
+    # methode = routeOptimization
+    # MIP
+    methode = VRPTWmip
+    solver = Solver(methode)
 
     # SELECTION
     # solution = solver.preprocess(clients, collecteurs)
@@ -63,6 +69,6 @@ if __name__ == "__main__":
     print("Temps :", time.perf_counter()-start)
     print("Distance :", value(solution, collecteur.vehicule_type))
     print_route(solution)
-    #preview(solution, collecteur, clients)
+    # preview(solution, collecteur, clients)
 
     print("\nNbr d'appel de distance :", methodes.cpt)

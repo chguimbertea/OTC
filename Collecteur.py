@@ -13,16 +13,16 @@ class Collecteur:
         self.nom = nom
         self.localisation = localisation
         self.capacite_depot = capacite_depot
-        self.horaires = [[0, 24]] if horaires is None else horaires
+        self.horaires = [[0, 24]] if horaires is None else horaires  # h
 
         self.vehicule_capacite = vehicule_capacite
-        self.vehicule_vitesse = vehicule_vitesse
+        self.vehicule_vitesse = vehicule_vitesse  # km/h
         if 25 < vehicule_vitesse:
             self.vehicule_type = "car"
         else:
             self.vehicule_type = "bike"
-        self.temps_collecte_fixe = temps_collecte_fixe
-        self.temps_collecte_caisse = temps_collecte_caisse
+        self.temps_collecte_fixe = temps_collecte_fixe  # min
+        self.temps_collecte_caisse = temps_collecte_caisse  # min
 
         self.cout_fixe = cout_fixe
         self.cout_km = cout_km

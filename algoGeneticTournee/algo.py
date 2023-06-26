@@ -42,26 +42,39 @@ def setup(list_client, mycollecteur):
 def checkSolution(solution):
     global collecteur
 
-    previousClient = pointsDePassage[solution[0]]
+    previousClient = collecteur
     passage = 60 * previousClient.horaires[0][0]
-    for s in solution[1:]:
-        dist = dict_distance[previousClient.indice, pointsDePassage[solution[s]].indice]
+    # Vérification du passage pour chaque point
+    for s in solution:
+        dist = dict_distance[previousClient.indice, pointsDePassage[s].indice]
         travelTime = dist / collecteur.vehicule_vitesse * 60  # min
         collectionTime = collecteur.temps_collecte_fixe \
-                         + collecteur.temps_collecte_caisse * pointsDePassage[solution[s]].quantite
+                         + collecteur.temps_collecte_caisse * pointsDePassage[s].quantite
         delta = passage + collectionTime + travelTime
         canPass = False
-        for start, end in pointsDePassage[solution[s]].horaires:
-            start = 60 * start
-            end = 60 * end
+        for start, end in pointsDePassage[s].horaires:
+            start = 60 * start  # min
+            end = 60 * end  # min
             if delta <= end:
                 passage = max(start, delta)
                 canPass = True
                 break
         if not canPass:
             return 1000
-        previousClient = pointsDePassage[solution[s]]
+        previousClient = pointsDePassage[s]
 
+    # Vérification de l'arrivée au dépôt
+    dist = dict_distance[previousClient.indice, collecteur.indice]
+    travelTime = dist / collecteur.vehicule_vitesse * 60  # min
+    delta = passage + travelTime
+    canPass = False
+    for start, end in collecteur.horaires:
+        end = 60 * end  # min
+        if delta <= end:
+            canPass = True
+            break
+    if not canPass:
+        return 1000
     return 1
 
 
@@ -73,7 +86,8 @@ def calculFitness(solution):
         for i in range(0, len(solution) - 1):
             dist += dict_distance[pointsDePassage[solution[i]].indice, pointsDePassage[solution[i + 1]].indice]
         dist += dict_distance[pointsDePassage[solution[-1]].indice, collecteur.indice]
-        dist = dist # * 1000  # m
+        # dist = dist * 1000  # m
+        dist = dist  # km
         return pow(dist * checkSolution(solution), 4)
 
 

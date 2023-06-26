@@ -250,8 +250,8 @@ class ALNS:
             cpt += 1
         return Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
 
-    def solve(self, pu=100, rho=0.3, sigma1=135, sigma2=70, sigma3=25, tolerance=0.05, coolingRate=0.99975, nc=2000,
-              dMax=0.2, theta=0.5, nbSwap=10, withSwap=False, showLog=False):
+    def solve(self, pu=100, rho=0.18, sigma1=135, sigma2=70, sigma3=25, tolerance=0.05, coolingRate=0.99975, nc=2000,
+              dMax=0.6, theta=0.2, nbSwap=4, withSwap=False, showLog=False):
         """
         FR:
         Fonction principale. Les différentes parties sont représentées dans le logigramme ou le pseudo code du rapport.

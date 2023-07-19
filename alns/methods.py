@@ -21,17 +21,17 @@ def fast_check(listClient, ntm, rpt, dtm):
                 isOpen = True
                 break
         if not isOpen:
-            print("Client n°{i} : {name}, isn't open today".format(i=client.indice, name=client.nom))
+            print("Client n°{i} : {name}, isn't open".format(i=client.indice, name=client.nom))
             return False
     return True
 
 
 def acceptance_criteria_greedy(currentSolution, testSolution):
     """
-    FR:
+    FR :
     Retourne True si on accepte la solution et False sinon.
 
-    EN :
+    EN:
     Returns True if the solution is accepted and False otherwise.
     """
     return currentSolution.getCost() < testSolution.getCost()
@@ -39,11 +39,11 @@ def acceptance_criteria_greedy(currentSolution, testSolution):
 
 def acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, alpha, step, onremontelapente=0):
     """
-    FR:
+    FR :
     Retourne True si on accepte la solution et False sinon. On a la possibilité ici d'accepter une solution
     moins bonne avec une probabilité p
 
-    EN :
+    EN:
     Returns True if the solution is accepted and False otherwise. We have the possibility here to accept a
     worst solution with probability p
     """
@@ -57,7 +57,6 @@ def acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, a
             p = math.exp(- (delta / cst))
         else:
             p = 1.1
-        # print(delta,T0,alpha,step)
         if r < p:
             onremontelapente += 1
             return True
@@ -70,7 +69,7 @@ def order_ListClient_random(listClient):
     FR :
     Tri de la liste des clients de manière aléatoire
 
-    EN :
+    EN:
     Sort randomly the list of clients
     """
     random.shuffle(listClient)
@@ -82,7 +81,7 @@ def order_ListClient_by_ratio(listClient):
     FR :
     Tri de la liste des clients dans l'ordre decroissant des ratios
 
-    EN :
+    EN:
     Sort the list of clients in descending order of ratios
     """
     listClient.sort(key=lambda x: x.ratio(), reverse=True)
@@ -112,9 +111,9 @@ def swap_two_client(routeA, routeB):
 def swap_intra_route(solution, listClient):
     """ SWAP INTRA ROUTE
     FR :
-    échange de deux clients au sein d'une meme route
+    échange de deux clients au sein d'une même route
 
-    EN :
+    EN:
     exchange two clients within the same route
     """
     # Copie de la solution initiale
@@ -125,8 +124,8 @@ def swap_intra_route(solution, listClient):
     nbIterationMax = 10
     solutionInitaleAssigned = True
 
-    # Tant qu'on n'a pas fait 10 itérations et (que la solution est incompatible ou que la solution
-    # initiale a été réassignée)
+    # Tant qu'on n'a pas fait 10 itérations et
+    # que la solution est incompatible ou que la solution initiale a été réassignée
     while nbIteration < nbIterationMax and (not check(solution, listClient) or solutionInitaleAssigned):
         solutionInitaleAssigned = False
 
@@ -151,14 +150,14 @@ def swap_intra_route(solution, listClient):
 
         # Vérification de la solution
         if not check(solution, listClient):
-            # Si la solution n'est pas compatible alors on réaffecte la solution de départ
+            # Si la solution n'est pas compatible, alors on réaffecte la solution de départ
             solutionInitaleAssigned = True
             solution.clone(solutionInitiale)
         nbIteration += 1
 
     # Vérification de la solution
     if not check(solution, listClient):
-        # Si la solution n'est pas compatible alors on réaffecte la solution de départ
+        # Si la solution n'est pas compatible, alors on réaffecte la solution de départ
         solution.clone(solutionInitiale)
 
 
@@ -167,13 +166,13 @@ def swap_inter_route(solution, listClient):
     FR :
     échange de deux clients au sein de deux routes strictement differentes
 
-    EN :
+    EN:
     exchange two clients within two strictly different routes
     """
     # Copie de la solution initiale
     solutionInitiale = solution.copy()
 
-    # initialisation des variables
+    # Initialisation des variables
     nbIteration = 0
     nbIterationMax = 10
     solutionInitaleAssigned = True
@@ -187,8 +186,8 @@ def swap_inter_route(solution, listClient):
     if nRoute <= 2 or routes_vides != 0:
         return
 
-    # Tant qu'on n'a pas fait 10 itérations et (que la solution est incompatible ou que la solution
-    # initiale a été réassignée)
+    # Tant qu'on n'a pas fait 10 itérations et
+    # que la solution est incompatible ou que la solution initiale a été réassignée
     while nbIteration < nbIterationMax and (not check(solution, listClient) or solutionInitaleAssigned):
         solutionInitaleAssigned = False
 
@@ -209,14 +208,14 @@ def swap_inter_route(solution, listClient):
 
         # Vérification de la solution
         if not check(solution, listClient):
-            # Si la solution n'est pas compatible alors on réaffecte la solution de départ
+            # Si la solution n'est pas compatible, alors on réaffecte la solution de départ
             solutionInitaleAssigned = True
             solution.clone(solutionInitiale)
         nbIteration += 1
 
     # Vérification de la solution
     if not check(solution, listClient):
-        # Si la solution n'est pas compatible alors on réaffecte la solution de départ
+        # Si la solution n'est pas compatible, alors on réaffecte la solution de départ
         solution.clone(solutionInitiale)
 
 
@@ -225,7 +224,7 @@ def choose_destroy_method(destroy_methods, Weights_destroy):
     FR :
     Fonction choisissant une méthode de destruction suivant les probabilités associées
 
-    EN :
+    EN:
     Function choosing a destruction method according to the associated probabilities
     """
     s = sum(Weights_destroy.values())
@@ -262,7 +261,7 @@ def update_weights(rho, Weights_destroy, Weights_repair, Success_destroy, Succes
                    Used_repair_methods):
     """
     FR:
-    Mise à jour des poids des methodes de destruction et de repair suivant les formules expliquées dans le rapport
+    Mise à jour des poids des méthodes de destruction et de réparation suivant les formules expliquées dans le rapport
 
     EN:
     Updating the weights of the destruction and repair methods according to the formulas explained in the report

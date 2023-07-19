@@ -22,7 +22,7 @@ class Instance:
         return self.distTravel[(min(firstClientId, secondClientId), max(firstClientId, secondClientId))]
 
     def display(self, showDistTravel=False):
-        # showDistTravel est un boolean correspondant à l'affichage de la distance entre chaque client
+        # showDistTravel est un booléen correspondant à l'affichage de la distance entre chaque client
         print("--- Instance {name} ---".format(name=self.name))
 
         print("* List of clients :")
@@ -34,5 +34,5 @@ class Instance:
 
         if showDistTravel:
             print("* Distance travel :")
-            for cle, valeur in self.distTravel.items():
-                print("\t-{cle} : {valeur}".format(cle=cle, valeur=valeur))
+            for key, value in self.distTravel.items():
+                print("\t-{cle} : {valeur}".format(cle=key, valeur=value))

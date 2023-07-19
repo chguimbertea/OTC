@@ -48,7 +48,7 @@ def find_position_on_route(solution, listClient, route, clientMissing, nbIterati
         # Ajout du client
         route.insertClient(position, clientMissing)
 
-        # Si la solution n'est pas compatible on enlève le client
+        # Si la solution n'est pas compatible, on enlève le client
         if not check(solution, listClient, False, True):
             route.removeClientByPosition(position)
             nbIterations += 1
@@ -61,40 +61,40 @@ def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMa
     positionFound = False
     for timeSlot in solution.listTimeSlot:
         for route in timeSlot.listRoute:
-            # Si l'ajout de clientMissing est possible au niveau capacité alors on essaie toutes les positions
+            # Si l'ajout de clientMissing est possible au niveau capacité, alors on essaie toutes les positions
             if clientMissing.quantite + route.getTotalQuantity() <= route.vehicle.capacity:
                 # si la route est vide :
                 if len(route.trajet) == 2:
                     route.insertClient(1, clientMissing)
 
-                    # Si la solution est compatible alors on sort de la boucle de client
+                    # Si la solution est compatible, alors on sort de la boucle de client
                     if check(solution, listClient, False, True):
                         positionFound = True
                         break
                     else:
-                        # Sinon on supprime l'ajout
+                        # Sinon, on supprime l'ajout
                         route.removeClientByPosition(1)
 
                 # si la route a au moins un client
                 for indiceClient in range(1, len(route.trajet) - 1):
                     route.insertClient(indiceClient, clientMissing)
-                    # Si la solution est compatible alors on sort de la boucle de client
+                    # Si la solution est compatible, alors on sort de la boucle de client
                     if check(solution, listClient, False, True):
                         positionFound = True
                         break
                     else:
-                        # Sinon on supprime l'ajout
+                        # Sinon, on supprime l'ajout
                         route.removeClientByPosition(indiceClient)
-            # Si on a trouvé une position on sort de la boucle de route
+            # Si on a trouvé une position, on sort de la boucle de route
             if positionFound:
                 break
         if positionFound:
             break
         if not positionFound:
-            # Sinon on essaie d'ajouter une route au time slot avec la position manquante
+            # Sinon, on essaie d'ajouter une route au time slot avec la position manquante
             # S'il est possible d'ajouter une route au time slot
             if len(timeSlot.listRoute) < routePerTimeSlotMax:
-                # Création de la route 0 => ckientMissing => 0
+                # Création de la route 0 => clientMissing => 0
                 newRoute = get_new_route(vehicle, clientMissing)
 
                 # Ajout au timeSlot courant
@@ -106,14 +106,14 @@ def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMa
                     positionFound = True
                     break
                 else:
-                    # Sinon on supprime la route de la liste du time slot
+                    # Sinon, on supprime la route de la liste du time slot
                     timeSlot.removeRoute(newRoute)
 
         # Si on a trouvé une solution, on sort de la liste de time slot
         if positionFound:
             break
         if not positionFound:
-            # Sinon on essaie d'ajouter un time slot si c'est possible
+            # Sinon, on essaie d'ajouter un time slot si c'est possible
             if len(solution.listTimeSlot) < numberTimeSlotMax:
                 # Ajout du time slot à la solution
                 newTimeSlot = get_new_timeSlot(vehicle, clientMissing)
@@ -154,7 +154,7 @@ def repair_randomV2(solution, listClient, vehicle, numberTimeSlotMax, routePerTi
     On choisit de mettre le client au hasard parmi les time slot existant et un nouveau time slot.
     Lorsqu'on a choisit le time slot, on choisit au hasard une route entre les routes existantes et une nouvelle route.
     On met ensuite le client au hasard dans la route choisie.
-    On recommence jusqu'a avoir inserer tous les clients de listClientMissing
+    On recommence jusqu'a avoir insérer tous les clients de listClientMissing
 
     EN :
     We choose to put the client at random among the existing time slot and a new time slot.
@@ -172,7 +172,7 @@ def repair_randomV2(solution, listClient, vehicle, numberTimeSlotMax, routePerTi
         nbIterations = 0
         nbIterationMax = 30
         while nbIterations < nbIterationMax:
-            # check(solution, listClient, False, False) #!!?
+            check(solution, listClient, False, False) # retire les routes et timeslots vides
             if not solution.listTimeSlot:
                 # Ajout du time slot à la solution
                 newTimeSlot = get_new_timeSlot(vehicle, clientMissing)
@@ -241,7 +241,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
     Ici on ne prend pas en compte le fait de mettre un client dans un nouveau time slot tout seul ou
     dans une route vide d'un time slot existant.
 
-    EN :
+    EN:
     Random repair method of a solution
     1 - Search for a missing client
     2 - Randomly add the client
@@ -282,10 +282,10 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                 timeSlot.appendRoute(newRoute)
 
                 if check(solution, listClient, False, True):
-                    # On a trouvé alors on sort de la boucle
+                    # On a trouvé alors, on sort de la boucle
                     break
                 else:
-                    # Sinon on supprime la route de la liste du time slot
+                    # Sinon, on supprime la route de la liste du time slot
                     timeSlot.removeRoute(newRoute)
                     cantinsert = True
                     break
@@ -307,7 +307,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                     route.insertClient(position, clientMissing)
 
                     # 3 - Vérification de la solution trouvée
-                    # Si la solution n'est pas compatible on enlève le client
+                    # Si la solution n'est pas compatible, on enlève le client
                     if not check(solution, listClient, False, True):
                         route.removeClientByPosition(position)
                     else:
@@ -409,10 +409,10 @@ def repair_FirstPositionAvailable_maxratio_listClient(solution, listClient, vehi
     1 - Recherche des clients manquants
     2 - Ajout de la position à la première place disponible dans le premier time slot
     3 - Si aucune place trouvée alors on cherche à créer une nouvelle route dans le même time slot
-    4 - Si aucune place n'est trouvée alors on passe au time slot suivant
+    4 - Si aucune place n'est trouvée, alors on passe au time slot suivant
     5 - Si aucune place n'est trouvée, on essaie d'ajouter un time slot
 
-    EN :
+    EN:
     Method of repairing the solution
     1 - Search for missing clients and sort this list randomly
     2 - Add the position to the first available place in the first time slot
@@ -501,9 +501,9 @@ def repair_random_best_insertion(solution, listClient, vehicle, numberTimeSlotMa
     """ BEST INSERTION RANDOM
     FR :
     Pour chaque client, on cherche l'endroit qui minimise l'augmentation du cout de la fonction objective lors de son
-    insertion dans la solution. La liste des clients à inserer est construite de manière aléatoire.
+    insertion dans la solution. La liste des clients à insérer est construite de manière aléatoire.
 
-    EN :
+    EN:
     For each client, we look for the place that minimises the increase of the cost of the objective function when it is
     inserted in the solution. The list of clients to be inserted is built randomly.
     """
@@ -551,7 +551,7 @@ def repair_max_ratio_best_insertion(solution, listClient, vehicle):
     """ BEST INSERTION MAX RATIO
     FR :
     Pour chaque client, on cherche l'endroit qui minimise l'augmentation du cout de la fonction objective lors de son
-    insertion dans la solution. La liste des clients à inserer est construite de manière decroissante du ratio.
+    insertion dans la solution. La liste des clients à insérer est construite de manière décroissante du ratio.
 
     EN :
     For each client, we look for the place that minimises the increase of the cost of the objective function when it is

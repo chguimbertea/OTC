@@ -35,7 +35,6 @@ def readClient(dataClients, listClient):
         if order < 0 or len(clients) <= order:
             raise Exception("Wrong order : {order}".format(order=order))
         clients[order] = client
-    # vérification que tous les clients sont placés ?
     return clients
 
 
@@ -92,8 +91,6 @@ def read_vehicle(dfVehicle, index):
 
 def read_vehicles(fileName):
     dfVehicles = pd.read_json(fileName, orient='records')
-    # if 'fixedCost' not in dfVehicle.index:
-    # dfVehicle['fixedCost'][0] = 0
     dfVehicles.fillna(0, inplace=True)
     for index, row in dfVehicles.iterrows():
         return read_vehicle(row, index)

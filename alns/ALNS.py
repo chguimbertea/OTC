@@ -38,9 +38,6 @@ class ALNS:
         # fréquence d'affichage des logs de recherche
         self.displayFrequency = 500
 
-        # nombre de fois où on accepte une solution moins bonne
-        self.onremontelapente = 0
-
         # nombre de fois où les repair ne marchent pas et on repart de la solution gardée en mémoire
         self.repairdontwork = {}
 
@@ -82,20 +79,10 @@ class ALNS:
         self.evolution_time_best = None
         self.evolution_cost = None
 
-    def getSolution(self):
-        return self.bestSolution
-
-    def setListClient(self, listClient):
-        # attention si client n'est pas dans l'instance !!
-        self.listClient = listClient
-
-    def setVehicle(self, vehicle):
-        self.vehicle = vehicle
-
     def createTimeSlot(self, listClient):
         timeSlot = TimeSlot()
 
-        # Boolean indiquant lorsqu'aucun client ne peut être ajouté sans violer la contrainte de durée
+        # Booléen indiquant lorsque aucun client ne peut être ajouté sans violer la contrainte de durée
         moreClientForDuration = True
 
         # Tant que la durée du time slot n'est pas dépassée et que le nombre de routes est inférieur à la limite
@@ -110,7 +97,7 @@ class ALNS:
             route = Route(self.vehicle)
             timeSlot.appendRoute(route)
 
-            # Boolean indiquant lorsqu'aucun client ne peut être ajouté sans violer la contrainte de capacité
+            # Booléen indiquant lorsque aucun client ne peut être ajouté sans violer la contrainte de capacité
             moreClientForCapacity = True
 
             # Tant que la capacité du véhicule n'est pas atteinte
@@ -129,7 +116,7 @@ class ALNS:
                         if timeSlot.getDuration(self.instance.getDistance) <= self.durationTimeSlotMax \
                                 and route.getTotalQuantity() <= route.vehicle.capacity \
                                 and route.canPass(self.instance.getDistance):
-                            # Si oui alors on valide l'ajout
+                            # Si oui, alors on valide l'ajout
                             client.setVisited()
                             moreClientForCapacity = True
                             moreClientForDuration = True
@@ -149,7 +136,7 @@ class ALNS:
         Une fois la capacité atteinte on essaie d'ajouter une autre route au time slot
         Sinon on crée un autre time slot
 
-        EN :
+        EN:
         Method of creating a basic solution
         Adding clients in a route in their parsing order until reaching either the max capacity of the vehicle
         or the maximum duration of the time slot
@@ -160,20 +147,20 @@ class ALNS:
         listClient = methods.order_ListClient_random(self.listClient.copy())
         clientNotPlaced = True
 
-        # Réinitialisation de la currentSolution
+        # Réinitialisation de la solution courante
         solution = Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
 
         while clientNotPlaced and len(solution.listTimeSlot) < self.numberTimeSlotMax:
-            # Si tous les clients sont placés alors on met fin à la boucle
+            # Si tous les clients sont placés, alors on met fin à la boucle
             clientNotPlaced = False
 
             # Création du timeSlot
             timeSlot = self.createTimeSlot(listClient)
 
-            # Ajout du timeSlot à la solution en cours
+            # Ajout du timeSlot à la solution courante
             solution.appendTimeSlot(timeSlot)
 
-            # Vérification que tous les clients ont été visités
+            # Vérification que tous les clients ont étés visités
             for client in self.listClient:
                 if not client.isVisited():
                     clientNotPlaced = True
@@ -187,13 +174,13 @@ class ALNS:
 
     def modification(self, solution, keptinmemory, destroy_method, degree_destruction, repair_method):
         """
-        FR:
-        Fonction prenant la solution courante et la transforme suivant la méthode de destruction et la méthode
-        de repair choisies. Cette fonction modifie current_solution. La nouvelle solution est dans current_solution.
+        FR :
+        Fonction prenant la solution courante et la transforme suivant la méthode de destruction et la méthode de
+        réparation choisies. Cette fonction modifie current_solution. La nouvelle solution est dans current_solution.
 
-        EN :
+        EN:
         Function taking the current solution and transforming it according to the chosen destruction method and
-        repair method. This function modifies current_solution. The new solution is in current_solution.
+        repair method. This function modifies current solution. The new solution is in current_solution.
         """
         if destroy_method == "destroy_worst_clients":
             destroyMethods.destroy_worst_clients(solution, degree_destruction)
@@ -253,13 +240,13 @@ class ALNS:
     def solve(self, pu=100, rho=0.18, sigma1=135, sigma2=70, sigma3=25, tolerance=0.05, coolingRate=0.99975, nc=2000,
               dMax=0.6, theta=0.2, nbSwap=4, withSwap=False, showLog=False):
         """
-        FR:
+        FR :
         Fonction principale. Les différentes parties sont représentées dans le logigramme ou le pseudo code du rapport.
         Cette fonction a en argument tous les paramètres de l'algorithme et retourne la meilleure solution.
         currentSolution correspond à la solution que l'on modifie à chaque iteration.
         testSolution correspond à la solution gardée en mémoire à laquelle on va comparer current solution.
 
-        EN :
+        EN:
         Main function.The different parts are represented in the flowchart or the pseudo code of the report.
         This function has as argument all the parameters of the algorithm and returns the best solution.
         currentSolution corresponds to the solution that we modify at each iteration.
@@ -289,7 +276,7 @@ class ALNS:
         nbIteration = 0  # nombre d'itérations
         iterationMaxSinceLastBest = nc  # nombre d'itérations maximum avant de réinitialiser la solution
         nbIterationSinceLastBest = 0  # nombre d'itérations avant de réinitialiser la solution
-        self.onremontelapente = 0  # nombre de fois que l'on accepte une solution moins bonne
+        onremontelapente = 0  # nombre de fois que l'on accepte une solution moins bonne
         self.evolution_iter_best = [nbIteration]  # iterations où on améliore la meilleure solution
         self.evolution_time_best = [nbIteration]  # temps où on améliore la meilleure solution
         self.evolution_cost = [round(self.bestSolution.getCost(), 2)]  # évolution du cout de la meilleure solution
@@ -392,8 +379,7 @@ class ALNS:
             # methods.acceptance_criteria_greedy(currentSolution, testSolution)
 
             if methods.acceptance_criteria_simulated_annealing(currentSolution, testSolution, T0, coolingRate,
-                                                               nbIteration,
-                                                               self.onremontelapente):
+                                                               nbIteration, onremontelapente):
                 # la solution courante est acceptée par le critère d'acceptance donc on la sauvegarde
                 testSolution.clone(currentSolution)
 
@@ -442,8 +428,8 @@ class ALNS:
                 print("{nIter}\t\t{time}\t{cost}\t\t{nbr}".format(nIter=nbIteration,
                                                                   time=round(time.perf_counter() - initialTime, 2),
                                                                   cost=round(self.bestSolution.getCost(), 2),
-                                                                  nbr=self.onremontelapente))
-                self.onremontelapente = 0
+                                                                  nbr=onremontelapente))
+                onremontelapente = 0
 
         self.bestSolution.setTime(self.evolution_time_best[-1], round(time.perf_counter() - initialTime, 3))
         self.bestSolution.setParameters(self.nIter, pu, rho, sigma1, sigma2, sigma3, tolerance, coolingRate, nc, theta,
@@ -462,7 +448,7 @@ class ALNS:
         return self.bestSolution
 
     def display(self):
-        print("## Nombre de fois ou les repair ne marchent pas et on repart de la solution gardée en memoire :")
+        print("## Nombre de fois ou les réparations ne marchent pas et on repart de la solution gardée en mémoire :")
         print(self.repairdontwork)
         print("## Iterations où on améliore la meilleure solution :")
         print(self.evolution_iter_best)
@@ -470,13 +456,13 @@ class ALNS:
         print(self.evolution_time_best)
         print("## Evolution du cout de la meilleure solution :")
         print(self.evolution_cost)
-        print("## Utilisation des méthodes jusqu'a la dernière meilleure solution :")
+        print("## Utilisation des méthodes jusqu'à la dernière meilleure solution :")
         print(self.USED_METHODS_UNTIL_LAST_BEST)
         print("## Utilisation des méthodes :")
         print(self.USED_METHODS)
-        print("## Poids des méthodes de destructions :")
+        print("## Poids des méthodes de destruction :")
         print(self.weights_destroy)
-        print("## Poids des méthodes de repair :")
+        print("## Poids des méthodes de réparation :")
         print(self.weights_repair)
         print("## Succès des swaps")
         print(self.sucess_swap)

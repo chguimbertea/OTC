@@ -24,7 +24,6 @@ def check_all_visited(listClient, clientToVisit, showLog=False):
 
 def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
     clientToVisit = solution.instance.listClient if clientToVisit is None else clientToVisit
-    # showLog = True
 
     # Méthode permettant de vérifier que l'on satisfait toutes les contraintes du problème
     '''Contrainte du nombre de time slot utilisés'''
@@ -48,7 +47,7 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
             return False
 
         for route in timeSlot.listRoute:
-            # Si la route courante n'a que 2 clients alors elle ne passe par aucun point de collecte
+            # Si la route courante n'a que 2 clients, alors elle ne passe par aucun point de collecte
             # Elle fait 0 → 0
             size = len(route.trajet)
             if size <= 2:

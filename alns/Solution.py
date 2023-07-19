@@ -152,7 +152,6 @@ class Solution:
             for client in self.instance.listClient:
                 self.satisfaction += client.priorite() * notInRoute[client.indice]
 
-        # duration ?!!
         cost = pow(self.satisfaction, alpha) + pow(self.fillRate, beta) + pow(self.usingCost, gamma)
         return cost
 
@@ -163,9 +162,8 @@ class Solution:
                 dist += route.getTotalDistance(self.instance.getDistance)
         return dist
 
-    def display(self, name=None):
-        name = self.instance.name if name is None else name
-        print("*** Solution {name} ***".format(name=name))
+    def display(self):
+        print("*** Solution {name} ***".format(name=self.instance.name))
         print("- Coût minimisé = {cost}".format(cost=self.getCost()))
         print("- Coût de la solution = {c} (= {k1}*{z1} + {k2}*{z2} + {k3}*{z3} + {k4}*{z4})".format(
             c=round(self.cost(), 2),

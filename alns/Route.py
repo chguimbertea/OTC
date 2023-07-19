@@ -29,8 +29,6 @@ class Route:
         return self.trajet[index]
 
     def appendClient(self, client):
-        if client.indice > 999:
-            return
         self.insertClient(-1, client)
 
     def insertClient(self, index, client):
@@ -101,13 +99,12 @@ class Route:
 
     def collectionTimeByClient(self, client):
         if client.indice > 999:
-            return 0
+            return self.vehicle.fixedCollectionTime
         return self.vehicle.fixedCollectionTime + self.vehicle.collectionTimePerCrate * client.quantite
 
     def canPass(self, distFunction):
         client = self.trajet[0]
         passage = 60 * client.horaires[0][0]
-        # allpassage = [passage / 60]
         for nextClient in self.trajet[1:]:
             dist = distFunction(client.indice, nextClient.indice)
             travelTime = dist / self.vehicle.speed * 60  # min
@@ -118,7 +115,6 @@ class Route:
                 end = 60 * end
                 if deltaTime <= end:
                     passage = max(start, deltaTime)
-                    # allpassage.append(passage / 60)
                     canPass = True
                     break
             if not canPass:
@@ -135,12 +131,12 @@ class Route:
         self.trajet = [self.vehicle.depot, self.vehicle.depot]
 
         # Copie des clients
-        for clientToCopy in routeToCopy.trajet:
+        for clientToCopy in routeToCopy.trajet[1:-1]:
             self.appendClient(clientToCopy)
 
     def copy(self):
         route = Route(self.vehicle, self.indice)
-        for client in self.trajet:
+        for client in self.trajet[1:-1]:
             route.appendClient(client)
         return route
 

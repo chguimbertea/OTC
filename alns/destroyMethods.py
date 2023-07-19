@@ -21,7 +21,7 @@ def destroy_random(solution, degree_destruction):
     FR :
     Opérateur de destruction aléatoire d'un nombre de clients donné par le degré de destruction
 
-    EN :
+    EN:
     Operator of random destruction of a number of clients given by the degree of destruction
     """
     # Calcul du nombre de clients à détruire
@@ -57,7 +57,7 @@ def destroy_Client_with_a_request_placed_at_the_end_of_the_solution(solution, de
     Opérateur de destruction basé sur le request des clients.
     Si le client est en fin de solution et qu'elle est requested alors on peut la supprimer
 
-    EN :
+    EN:
     Destruction operator based on client request.
     If the client is at the end of the solution and it is requested then it can be deleted
     """
@@ -102,7 +102,7 @@ def destroy_Client_with_a_high_ratio_placed_at_the_end_of_the_solution(solution,
     Opérateur de destruction visant à détruire les clients ayant un ratio élevé en fin de solution
     Ratio = quantité / capacité (+1 si le client est requested)
 
-    EN :
+    EN:
     Destruction operator to destroy customers with a high ratio at the end of the solution
     Ratio = quantity / capacity (+1 if the customer is requested)
     """
@@ -149,7 +149,7 @@ def destroy_worst_clients(solution, degree_destruction):
     FR :
     destruction des clients les plus couteux dans l'objectif
 
-    EN :
+    EN:
     destroy customers the most costly in the objective
     """
     nbClientToDestroy = degree_destruction
@@ -187,7 +187,7 @@ def destroy_related_client_by_distance(solution, degree_destruction, listClient)
     FR :
     mesure de la relativite entre clients qui correspond aux distances/temps.
 
-    EN :
+    EN:
     measure of relativity between customers in terms of distance between customers
     """
     destroy_related_clients(solution, degree_destruction, listClient, alpha=1, beta=0, gamma=0)
@@ -199,7 +199,7 @@ def destroy_related_clients(solution, degree_destruction, listClient, alpha=0.5,
     mesure de la relativite entre clients qui correspond a une ponderation entre distance, ratio et request
     à chaque étape un client est choisi et on enlève son plus proche voisin.
 
-    EN :
+    EN:
     measure of relativity between clients that corresponds to a weighting between distance, ratio and request
     at each step, we choose a client and remove its nearest neighbor.
     """
@@ -241,7 +241,7 @@ def destroy_route(solution):
     Detruit une route aleatoire dans la solution. Le nb de clients detruits ne depend pas du degrès de destruction
     mais du nombre de clients de la route detruite.
 
-    EN :
+    EN:
     Destroys a random route in the solution. The number of customers destroyed does not depend on the degree of
     destruction but on the number of customers on the destroyed route.
     """

@@ -5,26 +5,33 @@ from Client import Client
 from Collecteur import Collecteur
 
 
+def parse_contexte(fileName):
+    df = pd.read_json(fileName, orient='index')
+    name = df.at['name', 0]
+    ntm = df.at['numberTimeSlotMax', 0]
+    rtm = df.at['routePerTimeSlotMax', 0]
+    dtm = df.at['durationTimeSlotMax', 0]
+    return name, ntm, rtm, dtm
+
+
 def creer_collecteur(df, index):
-    nom = df['name']
-    capacite_depot = 1000  # if 'depot_capacity' in df.index else 1000
+    nom = df['nom']
+    capacite_depot = df['depotCapacite'] if 'depotCapacite' in df.index else 1000
 
     # LOCALISATION
-    adress = df['depotAdress']
+    adress = df['depotAdresse']
     loc = Localisation()
     if not loc.from_adress(adress):
         loc.from_DD(df['depotLatitude'], df['depotLongitude'])
 
     # HORAIRES
-    debut = df['earliestStart']
-    fin = 24 if df['latestEnd'] == 0 else df['latestEnd']
-    horaires = [[debut, fin]]
+    horaires = df['horaires']
 
     # VEHICULE
-    capacite_vehicule = df['capacity']
-    vitesse = df['speed']
-    fct = df['fixedCollectionTime']
-    ctc = df['collectionTimePerCrate']
+    capacite_vehicule = df['capacite']
+    vitesse = df['vitesse']
+    fct = df['tempsCollecteFixe']
+    ctc = df['tempsCollecteCaisse']
 
     # COST
     fixedCost = df['fixedCost'] if 'fixedCost' in df.index else 0
@@ -49,21 +56,19 @@ def parse_collecteurs(fileName):
 
 
 def creer_client(df, index):
-    nom = df['Name']
-    quantite = df['quantity']
-    capacite = -1 if df['Nb Casiers'] == 0 else df['Nb Casiers']  # pq?!!
-    requete = df['request']
-    dernier_passage = df['lastCollect']
+    nom = df['nom']
+    quantite = df['quantite']
+    capacite = -1 if df['capacite'] == 0 else df['capacite']  # pq?!!
+    requete = df['requete']
+    dernier_passage = df['derniere collecte'] if 'derniere collecte' in df.index else 0
     loc = Localisation(df['latitude'], df['longitude'])
-    horaires = df['hours'] if 'hours' in df.index else None
+    horaires = df['horaires'] if 'horaires' in df.index else []
     return Client(index, quantite, capacite, requete, loc, horaires, dernier_passage, nom)
 
 
 def parse_clients(fileName):
     clients = []
     df = pd.read_csv(fileName)
-    if 'hours' in df.columns:
-        df.hours = df.hours.apply(json.loads)
     for index, row in df.iterrows():
         clients.append(creer_client(row, index))
     return clients

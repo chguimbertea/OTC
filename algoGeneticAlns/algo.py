@@ -1,23 +1,21 @@
 import copy
 import random
 from algoGeneticAlns.dna import Dna, memory
-import matplotlib.pyplot as plt
-from collections import deque
 
 
 def map(value, istart, istop, ostart, ostop):
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
 
 
-def setup(method, pop_size=10):
+def setup(method, pop_size=10, fileName="./algoGeneticAlns/gene.csv"):
     print("Setup START---------")
 
     memory('alns', method)
     memory('parametres', [])
-    memory('file', open("./algoGeneticAlns/gene.csv", "w+"))
+    memory('file', open(fileName, "w+"))
     memory('file').write('rho;dmax;theta;Ns;Fitness\n')
     memory("metaParametres", [])
-    memory("metaParametresNb", 4)  # !!!
+    memory("metaParametresNb", 4)
     memory("metaParametresHistorique", [])
 
     memory("bestFitness", 89999999999999999999999999)
@@ -55,9 +53,10 @@ def calculateFitness(gene):
         solution = memory("alns").solve(rho=gene[0], dMax=gene[1], theta=gene[2], nbSwap=gene[3], withSwap=True)
         meanCost += solution.getCost()
         meanTime += solution.totalTime
-        # print("cost :", solution.getCost(), "\ttime :", solution.foundTime, "/", solution.totalTime)
-    # print("fitness :", pow(meanCost, 4), "+", pow(meanTime, 4))
-    return pow(meanCost, 4) + pow(meanTime, 4)
+    meanCost = meanCost/5
+    meanTime = meanTime/5
+    print("cost² :", pow(meanCost, 2), "time² :", pow(meanTime, 2))
+    return pow(meanCost, 2) + pow(meanTime, 2)
 
 
 def evaluate():
@@ -107,48 +106,14 @@ def selection():
         parentB = copy.deepcopy(memory("matingpool")[random.randint(0, len(memory("matingpool")) - 1)])
         child = parentA.crossover(parentB)
         newPath = Dna(child)
-        newPath.mutation(0.05)
+        newPath.mutation(0.1)
         newPopulation.append(newPath)
 
     memory('population', newPopulation)
 
 
-def displaySolution():
-    print("meta", memory("metaParametresHistorique"))
-    tau = deque(maxlen=40)
-    c = deque(maxlen=40)
-    theta = deque(maxlen=40)
-    ns = deque(maxlen=40)
-
-    for h in memory("metaParametresHistorique"):
-        tau.append(h[0])
-        c.append(h[1])
-        theta.append(h[2])
-        ns.append(h[3])
-
-    plt.plot(tau)
-    plt.scatter(range(len(tau)), tau)
-
-    plt.plot(c)
-    plt.scatter(range(len(c)), c)
-
-    plt.plot(theta)
-    plt.scatter(range(len(theta)), theta)
-
-    plt.plot(ns)
-    plt.scatter(range(len(ns)), ns)
-
-    # DRAW, PAUSE AND CLEAR
-    plt.draw()
-    plt.pause(0.1)
-    plt.clf()
-
-
 def run():
     evaluate()
     selection()
-
     print(memory("bestFitness"), ':', memory("bestMetaParametres"))
-
-    # displaySolution()
     print("meta", memory("metaParametresHistorique"))

@@ -2,7 +2,7 @@ from Localisation import Localisation
 
 
 class Client:
-    def __init__(self, indice=-1, quantite=0, capacite=-1, requete=False, localisation=Localisation(), horaires=[],
+    def __init__(self, indice=-1, quantite=0, capacite=-1, requete=False, localisation=Localisation(), horaires=None,
                  dernier_passage=0, nom="point"):
         self.indice = indice
         self.nom = nom
@@ -11,7 +11,7 @@ class Client:
         self.capacite = capacite
         self.requete = requete
         self.dernier_passage = dernier_passage  # Timestamp ?
-        self.horaires = [[0, 24*7]] if not horaires else horaires  # h
+        self.horaires = [[0, 24*7]] if horaires is None else horaires  # h
         self.indicateurTri = 1
         self.visite = False
 

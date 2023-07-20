@@ -13,7 +13,7 @@ class Collecteur:
         self.nom = nom
         self.localisation = localisation
         self.capacite_depot = capacite_depot
-        self.horaires = [[0, 24]] if horaires is None else horaires  # h
+        self.horaires = [[0, 24*7]] if horaires is None else horaires  # h
 
         self.vehicule_capacite = vehicule_capacite
         self.vehicule_vitesse = vehicule_vitesse  # km/h
@@ -32,6 +32,7 @@ class Collecteur:
     def display(self):
         print("- Collecteur n°{c} : {nom}".format(c=self.indice, nom=self.nom))
         print("\tLieu = {l}".format(l=self.localisation.to_string()))
+        print("\tHoraires = {h}".format(h=self.horaires))
         print("\tCapacité du dépôt = {c}".format(c=self.capacite_depot))
         print("\tCapacité du véhicule = {c}".format(c=self.vehicule_capacite))
         print("\tVitesse moyenne = {v}".format(v=self.vehicule_vitesse))

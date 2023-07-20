@@ -1,5 +1,5 @@
 import pandas as pd
-import json
+import ast
 from Localisation import Localisation
 from Client import Client
 from Collecteur import Collecteur
@@ -25,7 +25,7 @@ def creer_collecteur(df, index):
         loc.from_DD(df['depotLatitude'], df['depotLongitude'])
 
     # HORAIRES
-    horaires = df['horaires']
+    horaires = None if df['horaires'] == 0 else df['horaires']
 
     # VEHICULE
     capacite_vehicule = df['capacite']
@@ -62,7 +62,7 @@ def creer_client(df, index):
     requete = df['requete']
     dernier_passage = df['derniere collecte'] if 'derniere collecte' in df.index else 0
     loc = Localisation(df['latitude'], df['longitude'])
-    horaires = df['horaires'] if 'horaires' in df.index else []
+    horaires = ast.literal_eval(df['horaires']) if 'horaires' in df.index else None
     return Client(index, quantite, capacite, requete, loc, horaires, dernier_passage, nom)
 
 

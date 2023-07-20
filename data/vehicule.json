@@ -1,0 +1,65 @@
+[
+    {
+        "nom": "rebooteille",
+        "vitesse": 30,
+        "capacite": 120,
+        "fixedCost": 5,
+        "kmCost": 0.748,
+        "tempsCollecteFixe": 4,
+        "tempsCollecteCaisse": 0.25,
+        "depotAdresse": "25 RUE ARISTIDE BRIAND, 69800 SAINT-PRIEST",
+        "depotLatitude": 45.691413,
+        "depotLongitude": 4.932247,
+        "horaires": [[7, 16], [31, 40], [55, 64], [79, 88], [103, 112]]
+    },
+    {
+        "nom": "urby",
+        "vitesse": 15,
+        "capacite": 110,
+        "fixedCost": 0,
+        "crateCost": 2,
+        "tempsCollecteFixe": 4,
+        "tempsCollecteCaisse": 0.25,
+        "depotAdresse": "9 RUE DE BOURGOGNE, 69800 SAINT-PRIEST",
+        "depotLatitude": 45.692940,
+        "depotLongitude": 4.920496
+    },
+    {
+        "nom": "toutEnVelo",
+        "vitesse": 15,
+        "capacite": 20,
+        "crateCost": 2,
+        "tempsCollecteFixe": 2,
+        "tempsCollecteCaisse": 0.25,
+        "depotAdresse": "222 ROUTE DE VIENNE, 69008 LYON",
+        "depotLatitude": 45.730243,
+        "depotLongitude": 4.853482,
+        "horaires": [[7, 12], [31, 36], [55, 60], [79, 84], [103, 108]]
+    },
+    {
+        "nom": "alpeLogistique",
+        "vitesse": 30,
+        "capacite": 110,
+        "fixedCost": 9,
+        "kmCost": 0.18,
+        "stopCost": 19,
+        "tempsCollecteFixe": 4,
+        "tempsCollecteCaisse": 0.25,
+        "depotAdresse": "25 RUE ARISTIDE BRIAND, 69800 SAINT-PRIEST",
+        "depotLatitude": 45.691413,
+        "depotLongitude": 4.932247
+    },
+    {
+        "nom": "Compostond",
+        "vitesse": 40,
+        "capacite": 110,
+        "fixedCost": 10,
+        "kmCost": 0.18,
+        "crateCost": 1,
+        "tempsCollecteFixe": 4,
+        "tempsCollecteCaisse": 0.25,
+        "depotAdresse": "LE BAN LES TROIS, RUE DES 3 PONTS, 42500 LE CHAMBON-FEUGEROLLES",
+        "depotLatitude": 45.396833,
+        "depotLongitude": 4.299017
+    }
+]

@@ -2,14 +2,17 @@ import math
 import requests
 import geopy.distance as gd
 
-key = "98a66451-2b12-40a8-915b-210343f0d11c"
-cpt = 0
+key = None  # "98a66451-2b12-40a8-915b-210343f0d11c"
+cpt = 0  # compteur du nombre d'appels à la fonction distance
 
 
 def distance(locI, locJ, mode):
+    """
+    key = None, la valeur de la distance retournée est calculée à vol d'oiseau
+    key = value, la valeur de la distance retournée est exacte en tenant compte le chemin emprunté
+    """
     global cpt, key
     cpt += 1
-    key = None  # !!
     if key:
         r = requests.get("https://graphhopper.com/api/1/route?point=" + locI.to_url() + "&point=" + locJ.to_url()
                          + "&profile=" + mode + "&locale=en&calc_points=false&key=" + key)
@@ -29,8 +32,8 @@ def get_path_details(startLat, startLon, endLat, endLon, mode):
     if r.status_code == 200:
         line = r.json()['paths'][0]['points']['coordinates']
         route = []
-        for l in line:
-            route.append((l[1], l[0]))
+        for i in line:
+            route.append((i[1], i[0]))
         return route
     else:
         print("Status : ", r.status_code)
@@ -67,10 +70,8 @@ def fitness(solution, collecteur, list_client):
     remplissage = collecteur.vehicule_capacite / max(1, quantiteTotale)
 
     # COUT D'UTILISATION
-    cout = collecteur.cout_fixe \
-           + (1 + collecteur.cout_km) * distanceTotale \
-           + collecteur.cout_caisse * quantiteTotale \
-           + collecteur.cout_stop * (len(solution) - 2)
+    cout = collecteur.cout_fixe + (1 + collecteur.cout_km) * distanceTotale + \
+           collecteur.cout_caisse * quantiteTotale + collecteur.cout_stop * (len(solution) - 2)
 
     # SATISFACTION
     satisfaction = 0

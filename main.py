@@ -1,9 +1,13 @@
 import methodes
-from modeleVRPTW import VRPTWmip
+from algoGeneticTournee import algoGenConvertisseur
+from apiRO import routeOptimization
+from plne import VRPTWmip
 from Solver import Solver
 from alns import alnsConvertisseur
 from parser import parse_collecteurs, parse_clients
 import time
+
+from preview import preview, previewConvexHull
 
 
 def print_route(route):
@@ -23,18 +27,31 @@ def value(solution, mode):
     return dist
 
 
-def test_medium():
-    nom = "Medium6"
-    collecteur = parse_collecteurs("data/" + nom + "/vehicle.json")[0]
-    clients = parse_clients("data/" + nom + "/points.csv")
-    solution = alnsConvertisseur.solve(clients, collecteur)
-    print_route(solution)
+def test_select(collecteurs, clients, methode):
+    solver = Solver(methode)
+    solution = solver.preprocess(clients, collecteurs)
+    for s in solution.keys():
+        print("\nCollecteur : {n}".format(n=s.nom))
+        print_route(solution[s])
+        previewConvexHull(solution[s], listAllClient=clients)
 
 
 if __name__ == "__main__":
-    nom = 'Hub'
-    collecteurs = parse_collecteurs("data/vehicle.json")
-    clients = parse_clients("data/points60.csv")
+    nom = 'Janv'
+    collecteurs = parse_collecteurs("data/vehicule.json")
+    clients = parse_clients("data/points80123.csv")
+    # clients = parse_clients("data/points60.csv")
+
+    # ALNS
+    methode = alnsConvertisseur
+    # ALGO GENETIQUE
+    # methode = algoGenConvertisseur
+    # ROUTE OPTIMIZATION API
+    # methode = routeOptimization
+    # MIP
+    # methode = VRPTWmip
+
+    solver = Solver(methode)
 
     collecteur = collecteurs[0]
     selection = []
@@ -42,23 +59,6 @@ if __name__ == "__main__":
     l = [0, 11, 35, 47, 50]
     for i in l:
         selection.append(clients[i])
-
-    # ALNS
-    # methode = alnsConvertisseur
-    # ALGO GENETIQUE
-    # methode = algoGenConvertisseur
-    # ROUTE OPTIMIZATION API
-    # methode = routeOptimization
-    # MIP
-    methode = VRPTWmip
-    solver = Solver(methode)
-
-    # SELECTION
-    # solution = solver.preprocess(clients, collecteurs)
-    # for s in solution.keys():
-    #     print("\nCollecteur : {n}".format(n=s.nom))
-    #     print_route(solution[s])
-    #     previewConvexHull(solution[s], listAllClient=clients)
 
     start = time.perf_counter()
     solution = solver.solve(selection, collecteur)

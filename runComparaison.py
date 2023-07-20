@@ -3,7 +3,7 @@ from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur
 from alns import alnsConvertisseur
 from apiRO import routeOptimization
-from modeleVRPTW import VRPTWmip
+from plne import VRPTWmip
 from parser import parse_collecteurs, parse_clients
 import time
 
@@ -22,11 +22,12 @@ if __name__ == "__main__":
 
     # INSTANCE
     instance = 'Hub3'
-    collecteurs = parse_collecteurs("data/vehicle.json")
+    collecteurs = parse_collecteurs("data/vehicule.json")
     clients = parse_clients("data/points60.csv")
     collecteur = collecteurs[0]
     selection = []
     for i in [0, 11, 35, 47, 50]:
+    #for i in [0, 11, 12, 31, 35, 45, 47, 50, 51, 62]:
         selection.append(clients[i])
 
     # SOLVERS
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 
     list_solvers = []
     list_noms = []
-    for i in [0, 1]:
+    for i in range(4):
         list_solvers.append(solvers[i])
         list_noms.append(noms[i])
 
@@ -54,4 +55,4 @@ if __name__ == "__main__":
             tps = time.perf_counter() - start
             distance = value(solution, collecteur.vehicule_type)
             file.write(instance + ";" + nbr + ";" + list_noms[i] + ";" + str(distance) + ";" + str(tps) + "\n")
-        #time.sleep(30)
+        time.sleep(30)

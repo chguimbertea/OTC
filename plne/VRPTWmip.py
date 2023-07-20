@@ -69,7 +69,7 @@ def solve(list_client, collecteur, showLog=False):
     # depart de la premiere route : k = 0, i = 0
     for j in range(1, NN):
         trajet = delta(0, j) / vv
-        model += (t[0][j] >= a + trajet - (a + trajet) * (1 - x[0][0][j]))
+        model += (t[0][j] >= (a + trajet) * x[0][0][j])
 
     # depart d'une autre route : i = 0
     for k in range(1, NK):
@@ -99,7 +99,7 @@ def solve(list_client, collecteur, showLog=False):
             for e in range(len(all_point[i].horaires)):
                 aa = all_point[i].horaires[e][0]
                 bb = all_point[i].horaires[e][1]
-                model += (t[k][i] >= aa - aa*(1-u[k][i][e]))
+                model += (t[k][i] >= aa * u[k][i][e])
                 model += (t[k][i] <= bb + (b-bb)*(1-u[k][i][e]))
             model += (xsum(u[k][i][e] for e in range(len(all_point[i].horaires))) == 1)
 

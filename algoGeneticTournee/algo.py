@@ -10,9 +10,9 @@ from preview import previewConvexHull
 runing = False
 pointsDePassage = []
 bestSolution = []
-bestFitness = 999999999
-nbGeneration = 2000
+bestFitness = 999999999999
 nbPopulation = 1000
+tauxMutation = 0.1
 piscine = []
 collecteur = None
 matingpool = []
@@ -23,10 +23,12 @@ def map(value, istart, istop, ostart, ostop):
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
 
 
-def setup(list_client, mycollecteur):
-    global pointsDePassage, piscine, collecteur, dict_distance
+def setup(list_client, my_collecteur, nb_pop=1000, taux_mut=0.05):
+    global pointsDePassage, piscine, collecteur, dict_distance, nbPopulation, tauxMutation
     pointsDePassage = list_client
-    collecteur = mycollecteur
+    collecteur = my_collecteur
+    nbPopulation = nb_pop
+    tauxMutation = taux_mut
     for i in range(0, nbPopulation):
         s = [j for j in range(0, len(pointsDePassage))]
         random.shuffle(s)
@@ -34,8 +36,8 @@ def setup(list_client, mycollecteur):
         piscine.append(dna)
 
     tmp_list_point = list_client.copy()
-    tmp_list_point.append(mycollecteur)
-    dict_distance = {(i.indice, j.indice): distance(i.localisation, j.localisation, mycollecteur.vehicule_type)
+    tmp_list_point.append(collecteur)
+    dict_distance = {(i.indice, j.indice): distance(i.localisation, j.localisation, collecteur.vehicule_type)
                      for i in tmp_list_point for j in tmp_list_point}
 
 
@@ -86,8 +88,7 @@ def calculFitness(solution):
         for i in range(0, len(solution) - 1):
             dist += dict_distance[pointsDePassage[solution[i]].indice, pointsDePassage[solution[i + 1]].indice]
         dist += dict_distance[pointsDePassage[solution[-1]].indice, collecteur.indice]
-        # dist = dist * 1000  # m
-        dist = dist  # km
+        # dist en km
         return pow(dist * checkSolution(solution), 4)
 
 
@@ -115,7 +116,11 @@ def evaluation():
         bestSolution = piscine[indexBest].gene
 
     for p in piscine:
-        p.fitness = map(p.fitness, minfit, maxfit, 10, 0)
+        if minfit == maxfit:
+            f = 5
+        else:
+            f = map(p.fitness, minfit, maxfit, 10, 0)
+        p.fitness = f
 
     matingpool = []
     for p in piscine:
@@ -125,14 +130,14 @@ def evaluation():
 
 
 def selection():
-    global matingpool, piscine
+    global matingpool, piscine, tauxMutation
     newPopulation = []
     for i in range(0, nbPopulation):
         parentA = copy.deepcopy(matingpool[random.randint(0, len(matingpool) - 1)])
         parentB = copy.deepcopy(matingpool[random.randint(0, len(matingpool) - 1)])
         child = parentA.crossover(parentB)
         newPath = Dna(child)
-        newPath.mutation(0.1)  # !!
+        newPath.mutation(tauxMutation)
         newPopulation.append(newPath)
 
     piscine = copy.deepcopy(newPopulation)
@@ -157,20 +162,12 @@ def run(showLog=False):
         previewConvexHull(listC, listLocation)
 
         if runing == False:
-            # webbrowser.open('http://localhost:63342/rebooteille-DISP-AG/algoGeneticTournee/view.html?_ijt=oe6565he8bdsv396es0mmdgfjr&_ij_reload=RELOAD_ON_SAVE')  # Go to example.com
+            # CHANGE THE PATH
             webbrowser.open('file:///home/chloe/PycharmProjects/optimisationTournee/view.html')
             runing = True
 
 
-def to_xy(point, r, cos_phi_0):
-    lam = point[0]
-    phi = point[1]
-    return r * math.radians(lam) * cos_phi_0, r * math.radians(phi)
-
-
 def getBestSolution():
-    # depot = Client(indice=collecteur.indice, localisation=collecteur.localisation,
-    #                horaires=collecteur.horaires, nom="depot_" + collecteur.nom)
     if checkSolution(bestSolution) != 1:
         return []
     solution = [collecteur]

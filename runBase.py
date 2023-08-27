@@ -4,7 +4,8 @@ import pandas as pd
 from Localisation import Localisation
 from Client import Client
 from Collecteur import Collecteur
-import alns.alnsConvertisseur as ac
+from alns.Instance import Instance
+from alns.ALNS import ALNS
 
 
 def parse_contexte(fileName):
@@ -87,7 +88,6 @@ if __name__ == "__main__":
     filePath = "dataBase"
     if len(sys.argv) > 2:
         filePath = sys.argv[1]
-
     collecteur = parse_collecteurs(filePath+"/vehicule.json")[0]
     clients = parse_clients(filePath+"/points.csv")
     nom, ntm, rtm, dtm = parse_contexte(filePath+"/contexte.json")
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         if obj in ["cost", "distance", "duration"]:
             objectif = obj
 
-    instance = ac.Instance(clients, collecteur, nom, obj=objectif)
-    methode = ac.ALNS(instance, ntm, rtm, dtm)
+    instance = Instance(clients, collecteur, nom, obj=objectif)
+    methode = ALNS(instance, ntm, rtm, dtm)
     solution = methode.solve(withSwap=False)
     solution.display()

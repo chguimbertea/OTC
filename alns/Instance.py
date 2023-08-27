@@ -5,16 +5,18 @@ from methodes import distance
 
 
 class Instance:
-    def __init__(self, listClient, vehicle, name="present"):
+    def __init__(self, listClient, collecteur, name="present", obj="cost", dist=None):
         self.listClient = listClient.copy()
-        self.vehicle = vehicle
+        self.collecteur = collecteur
         self.name = name
+        self.objectif = obj
 
         # DISTANCE BETWEEN EVERY POINT
         tmpListPoint = listClient.copy()
-        tmpListPoint.append(vehicle.depot)
-        self.distTravel = {(i.indice, j.indice): distance(i.localisation, j.localisation, vehicle.type)
-                           for i in tmpListPoint for j in tmpListPoint if i.indice < j.indice}  # km
+        tmpListPoint.append(collecteur)
+        if dist is None:
+            self.distTravel = {(i.indice, j.indice): distance(i.localisation, j.localisation, collecteur.vehicule_type)
+                               for i in tmpListPoint for j in tmpListPoint if i.indice < j.indice}  # km
 
     def getDistance(self, firstClientId, secondClientId):  # km
         if firstClientId == secondClientId:
@@ -29,8 +31,8 @@ class Instance:
         for client in self.listClient:
             client.display()
 
-        print("* Vehicles :")
-        self.vehicle.display()
+        print("* Collector :")
+        self.collecteur.display()
 
         if showDistTravel:
             print("* Distance travel :")

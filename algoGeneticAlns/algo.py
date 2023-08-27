@@ -61,23 +61,23 @@ def calculateFitness(gene):
 
 def evaluate():
     for p in memory("population"):
-        p.fitness = calculateFitness(p.gene)
+        p.fitness_single_routing = calculateFitness(p.gene)
 
     indexBest = -1
-    minfit = memory("population")[0].fitness
-    maxfit = memory("population")[0].fitness
+    minfit = memory("population")[0].fitness_single_routing
+    maxfit = memory("population")[0].fitness_single_routing
 
     for i, p in enumerate(memory("population")):
-        if p.fitness <= minfit:
-            minfit = p.fitness
+        if p.fitness_single_routing <= minfit:
+            minfit = p.fitness_single_routing
             indexBest = i
 
-        if p.fitness > maxfit:
-            maxfit = p.fitness
+        if p.fitness_single_routing > maxfit:
+            maxfit = p.fitness_single_routing
 
     if indexBest >= 0:
         memory("bestMetaParametres", memory("population")[indexBest].gene)
-        memory("bestFitness", memory("population")[indexBest].fitness)
+        memory("bestFitness", memory("population")[indexBest].fitness_single_routing)
         memory("metaParametresHistorique").append(memory("population")[indexBest].gene)
         memory('file').write(str(memory("population")[indexBest].gene[0]) + ";")
         memory('file').write(str(memory("population")[indexBest].gene[1]) + ";")
@@ -89,12 +89,12 @@ def evaluate():
         if minfit == maxfit:
             f = 0.5
         else:
-            f = map(p.fitness, minfit, maxfit, 1, 0)
-        p.fitness = f
+            f = map(p.fitness_single_routing, minfit, maxfit, 1, 0)
+        p.fitness_single_routing = f
 
     memory("matingpool", [])
     for p in memory('population'):
-        n = p.fitness * 10
+        n = p.fitness_single_routing * 10
         for i in range(0, int(n) + 1):
             memory("matingpool").append(p)
 

@@ -1,18 +1,20 @@
 from collections import deque
 from matplotlib import pyplot as plt
 import pandas as pd
-import alns.alnsConvertisseur as ac
+import runBase as rb
 
 from algoGeneticAlns import algo
-from parser import parse_collecteurs, parse_clients
 
 
 def solve(nbGeneration=100, nbPopulation=10, fileName="./algoGeneticAlns/gene.csv"):
-    collecteur = parse_collecteurs("data/Medium6/vehicule.json")[0]
-    vehicule = ac.collecteurToVehicle(collecteur)
-    clients = parse_clients("data/Medium6/points.csv")
-    instance = ac.Instance(clients, vehicule)
-    methode = ac.ALNS(instance)
+    # LECTURE DES DONNÉES
+    filePath = "dataBase"
+    collecteur = rb.parse_collecteurs(filePath + "/vehicule.json")[0]
+    clients = rb.parse_clients(filePath + "/points.csv")
+    nom, ntm, rtm, dtm = rb.parse_contexte(filePath + "/contexte.json")
+
+    instance = rb.Instance(clients, collecteur, nom, obj="cost")
+    methode = rb.ALNS(instance, ntm, rtm, dtm)
 
     algo.setup(methode, nbPopulation, fileName)
     for i in range(nbGeneration):

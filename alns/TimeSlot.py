@@ -22,10 +22,10 @@ class TimeSlot:
     def removeRoute(self, routeToRemove):
         self.listRoute.remove(routeToRemove)
 
-    def getDuration(self, distFunction):
+    def getDuration(self, distFunction, toObjectif=False):
         s = 0
         for route in self.listRoute:
-            s += route.getDuration(distFunction)
+            s += route.getDuration(distFunction, toObjectif)
         self.duration = s
         return self.duration
 
@@ -37,7 +37,7 @@ class TimeSlot:
         # Copie des routes
         self.listRoute = []
         for routeToCopy in timeSlotToCopy.listRoute:
-            route = Route(routeToCopy.vehicle)
+            route = Route(routeToCopy.collecteur)
             route.clone(routeToCopy)
             self.appendRoute(route)
 

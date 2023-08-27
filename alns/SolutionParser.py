@@ -5,22 +5,23 @@ from Localisation import Localisation
 from alns.Instance import Instance
 from alns.TimeSlot import TimeSlot
 from alns.Route import Route
-from alns.Vehicle import Vehicle
+from Collecteur import Collecteur
 from Client import Client
 from alns.Solution import Solution
 from parser import parse_clients
 
 
-def findVehicle(dataVehicle, listVehicle):
-    name = dataVehicle['name']
-    capacity = int(dataVehicle['capacity'])
-    speed = float(dataVehicle['speed'])
-    for v in listVehicle:
-        if v.name == name and v.capacity == capacity and v.speed == speed:
-            return v
-    fct = float(dataVehicle['fixedCollectionTime'])
-    ctc = float(dataVehicle['collectionTimePerCrate'])
-    return Vehicle(capacity, speed, fct, ctc, Client(), name=name)
+def findCollecteur(dataCollecteur, listCollecteur):
+    name = dataCollecteur['name']
+    capacity = int(dataCollecteur['capacity'])
+    speed = float(dataCollecteur['speed'])
+    for c in listCollecteur:
+        if c.nom == name and c.vehicule_capacite == capacity and c.vehicule_vitesse == speed:
+            return c
+    fct = float(dataCollecteur['fixedCollectionTime'])
+    ctc = float(dataCollecteur['collectionTimePerCrate'])
+    return Collecteur(nom=name, vehicule_capacite=capacity, vehicule_vitesse=speed,
+                      temps_collecte_fixe=fct, temps_collecte_caisse=ctc)
 
 
 def readClient(dataClients, listClient):
@@ -39,11 +40,11 @@ def readClient(dataClients, listClient):
 
 
 def readRoute(dataRoute, listClient, listVehicle):
-    vehicle = findVehicle(dataRoute['vehicle'][0], listVehicle)
-    route = Route(vehicle)
+    collecteur = findCollecteur(dataRoute['collector'][0], listVehicle)
+    route = Route(collecteur)
     route.trajet = readClient(dataRoute['route'], listClient)
-    if route.vehicle.depot.indice == -1:
-        route.vehicle.depot = route.trajet[0]
+    if route.collecteur.indice == -1:
+        route.collecteur = route.trajet[0]
     return route
 
 
@@ -57,18 +58,6 @@ def readTimeSlot(dataTimeSlot, listClient, listVehicle, distFunc):
     return timeSlot
 
 
-def read_depot(df, name, index):
-    adress = df['depotAdress']
-    loc = Localisation()
-    if not loc.from_adress(adress):
-        loc.from_DD(df['depotLatitude'], df['depotLongitude'])
-
-    earliestStart = df['earliestStart']
-    latestEnd = 24 if df['latestEnd'] == 0 else df['latestEnd']
-    hours = [[earliestStart, latestEnd]]
-    return Client(indice=index, localisation=loc, horaires=hours, nom="depot_" + name)
-
-
 def read_vehicle(dfVehicle, index):
     name = dfVehicle['name']
     capacity = dfVehicle['capacity']
@@ -77,16 +66,20 @@ def read_vehicle(dfVehicle, index):
     ctc = dfVehicle['collectionTimePerCrate']
 
     # COST
-
     fixedCost = dfVehicle['fixedCost']
     kmCost = dfVehicle['kmCost']
     crateCost = dfVehicle['crateCost']
     stopCost = dfVehicle['stopCost']
 
     # DEPOT
-    depot = read_depot(dfVehicle, name, 1000 + index)
+    loc = Localisation(dfVehicle['depotLatitude'], dfVehicle['depotLongitude'])
+    earliestStart = dfVehicle['earliestStart']
+    latestEnd = 24 if dfVehicle['latestEnd'] == 0 else dfVehicle['latestEnd']
+    hours = [[earliestStart, latestEnd]]
 
-    return Vehicle(capacity, speed, fct, ctc, depot, fixedCost, kmCost, crateCost, stopCost, name)
+    return Collecteur(nom=name, indice=1000 + index, vehicule_capacite=capacity, vehicule_vitesse=speed,
+                      temps_collecte_fixe=fct, temps_collecte_caisse=ctc, localisation=loc, horaires=hours,
+                      cout_fixe=fixedCost, cout_km=kmCost, cout_caisse=crateCost, cout_stop=stopCost)
 
 
 def read_vehicles(fileName):
@@ -98,10 +91,10 @@ def read_vehicles(fileName):
 
 def parse_solution_from_files(clientFilePath, vehicleFilPath, solutionPath):
     listClient = parse_clients(clientFilePath)
-    vehicle = read_vehicles(vehicleFilPath)
+    collecteur = read_vehicles(vehicleFilPath)
 
     data = json.load(open(solutionPath))
-    instance = Instance(listClient, vehicle, data['name'])
+    instance = Instance(listClient, collecteur, data['name'])
 
     nIter = data['nIter']
     ntm = data['number max of timeslot']
@@ -124,7 +117,7 @@ def parse_solution_from_files(clientFilePath, vehicleFilPath, solutionPath):
     solution.setTime(foundTime, totalTime)
 
     for dataTimeSlot in data['routing']:
-        timeSlot = readTimeSlot(dataTimeSlot, instance.listClient, instance.vehicle, instance.getDistance)
+        timeSlot = readTimeSlot(dataTimeSlot, instance.listClient, instance.collecteur, instance.getDistance)
         solution.appendTimeSlot(timeSlot)
     solution.cost()
     return solution

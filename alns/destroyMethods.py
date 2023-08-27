@@ -84,7 +84,7 @@ def destroy_Client_with_a_request_placed_at_the_end_of_the_solution(solution, de
             timeSlot = solution.listTimeSlot[indiceTimeSlot]
             for route in timeSlot.listRoute:
                 for client in route.trajet:
-                    if client.requete:
+                    if client.indice < 999 and client.requete:
                         route.removeClient(client)
                         nbClientDestroyed += 1
                         if nbClientDestroyed >= numberOfClientToDestroy:
@@ -248,6 +248,6 @@ def destroy_route(solution):
     timeSlot = solution.listTimeSlot[random.randint(0, len(solution.listTimeSlot) - 1)]
     route = timeSlot.listRoute[random.randint(0, len(timeSlot.listRoute) - 1)]
 
-    route.trajet = [route.vehicle.depot, route.vehicle.depot]
+    route.trajet = [route.collecteur, route.collecteur]
     route.totalQuantity = 0
     route.duration = 0

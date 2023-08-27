@@ -3,19 +3,19 @@ import os.path
 from alns.Solution import Solution
 
 
-def writeVehicle(vehicle):
-    dictVehicle = {
-        "name": vehicle.name,
-        "capacity": str(vehicle.capacity),
-        "speed": str(vehicle.speed),
-        "fixedCollectionTime": str(vehicle.fixedCollectionTime),
-        "collectionTimePerCrate": str(vehicle.collectionTimePerCrate),
-        "fixedCost": str(vehicle.fixedCost),
-        "kmCost": str(vehicle.kmCost),
-        "crateCost": str(vehicle.crateCost),
-        "stopCost": str(vehicle.stopCost)
+def writeCollector(collecteur):
+    dictCollector = {
+        "name": collecteur.nom,
+        "capacity": str(collecteur.vehicule_capacite),
+        "speed": str(collecteur.vehicule_vitesse),
+        "fixedCollectionTime": str(collecteur.temps_collecte_fixe),
+        "collectionTimePerCrate": str(collecteur.temps_collecte_caisse),
+        "fixedCost": str(collecteur.cout_fixe),
+        "kmCost": str(collecteur.cout_km),
+        "crateCost": str(collecteur.cout_caisse),
+        "stopCost": str(collecteur.cout_stop)
     }
-    return dictVehicle
+    return dictCollector
 
 
 def writeClient(client, order):
@@ -33,7 +33,7 @@ def writeRoute(route, idRoute):
     dictRoute = {
         "id": idRoute,
         "duration": route.duration,
-        "vehicle": [writeVehicle(route.vehicle)],
+        "collector": [writeCollector(route.collecteur)],
         "route": []
     }
     for order in range(len(route.trajet)):
@@ -76,7 +76,7 @@ def toJson(solution, solutionPath="./result/", fileName=None):
         "K3": Solution.facteurZ3,
         "K4": Solution.facteurZ4,
         "cost": solution.cost(),
-        "fitness": solution.fitness(),
+        "fitness": solution.fitness_single_routing(),
         "found time": solution.foundTime,
         "total time": solution.totalTime,
         "routing": []

@@ -13,13 +13,13 @@ def get_missing_client_list(listTimeSlot, listClient):
     for timeSlot in listTimeSlot:
         for route in timeSlot.listRoute:
             for client in route.trajet:
-                client.setVisited()
+                client.visite = True
 
     # Réinitialisation des attributs visited des clients
     for client in listClient:
-        if not client.isVisited():
+        if not client.visite:
             listClientMissing.append(client)
-        client.setNotVisited()
+        client.visite = False
     return listClientMissing
 
 
@@ -44,7 +44,7 @@ def get_new_timeSlot(vehicle, clientMissing=None):
 def find_position_on_route(solution, listClient, route, clientMissing, nbIterations):
     bound = max(1, len(route.trajet) - 2)
     position = random.randint(1, bound)
-    if route.getTotalQuantity() + clientMissing.quantity < route.vehicle.capacity:
+    if route.getTotalQuantity() + clientMissing.quantity < route.collecteur.vehicule_capacite:
         # Ajout du client
         route.insertClient(position, clientMissing)
 
@@ -62,7 +62,7 @@ def find_position(solution, listClient, clientMissing, vehicle, numberTimeSlotMa
     for timeSlot in solution.listTimeSlot:
         for route in timeSlot.listRoute:
             # Si l'ajout de clientMissing est possible au niveau capacité, alors on essaie toutes les positions
-            if clientMissing.quantite + route.getTotalQuantity() <= route.vehicle.capacity:
+            if clientMissing.quantite + route.getTotalQuantity() <= route.collecteur.vehicule_capacite:
                 # si la route est vide :
                 if len(route.trajet) == 2:
                     route.insertClient(1, clientMissing)
@@ -302,7 +302,7 @@ def repair_randomv1(solution, listClient, vehicle, repairdontwork):
                     position = 1
 
                 # Si le client est ajoutable d'un point de vue capacité
-                if route.getTotalQuantity() + clientMissing.quantite < route.vehicle.capacity:
+                if route.getTotalQuantity() + clientMissing.quantite < route.collecteur.vehicule_capacite:
                     # Ajout du client
                     route.insertClient(position, clientMissing)
 

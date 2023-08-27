@@ -64,9 +64,11 @@ class Solution:
         self.ns = ns
 
     def getCost(self):
-        # return self.cost()
-        # return self.fitness()
-        return self.distance()
+        if self.instance.objectif == "distance":
+            return self.distance()
+        if self.instance.objectif == "duration":
+            return self.getDuration()
+        return self.cost()
 
     def appendTimeSlot(self, timeSlot):
         self.listTimeSlot.append(timeSlot)
@@ -116,7 +118,7 @@ class Solution:
                         clientArrivee = route.getClientByIndex(indexClient + 1)
 
                         # Calcul de Z2
-                        if indexTimeSlot + 1 > 1:
+                        if indexTimeSlot + 1 > 1 and clientArrivee.indice < 999:
                             self.requestPriorityPenalty += (math.floor(10 * (clientArrivee.ratio()))
                                                             * indexTimeSlot) / 10
 
@@ -132,35 +134,18 @@ class Solution:
         cost += Solution.facteurZ3 * self.inventoryPriorityPenalty + Solution.facteurZ4 * nbTimeSlot
         return cost
 
-    def fitness(self, alpha=8, beta=4, gamma=4):
-        self.satisfaction = 0
-        self.fillRate = 0
-        self.usingCost = 0
-        self.duration = 0
-        notInRoute = {client.indice: 1 for client in self.instance.listClient}
-
-        for timeslot in self.listTimeSlot:
-            self.duration += timeslot.getDuration(self.instance.getDistance)
-
-            for route in timeslot.listRoute:
-                self.fillRate += route.vehicle.capacity / max(1, route.getTotalQuantity())
-                self.usingCost += route.getVehicleCost(self.instance.getDistance)
-
-                for client in route.trajet:
-                    notInRoute[client.indice] = 0
-
-            for client in self.instance.listClient:
-                self.satisfaction += client.priorite() * notInRoute[client.indice]
-
-        cost = pow(self.satisfaction, alpha) + pow(self.fillRate, beta) + pow(self.usingCost, gamma)
-        return cost
-
     def distance(self):
         dist = 0
         for timeslot in self.listTimeSlot:
             for route in timeslot.listRoute:
                 dist += route.getTotalDistance(self.instance.getDistance)
         return dist
+
+    def getDuration(self):
+        dur = 0
+        for timeslot in self.listTimeSlot:
+            dur += timeslot.getDuration(self.instance.getDistance, True)
+        return dur
 
     def display(self):
         print("*** Solution {name} ***".format(name=self.instance.name))
@@ -175,16 +160,14 @@ class Solution:
             z3=self.inventoryPriorityPenalty,
             k4=Solution.facteurZ4,
             z4=len(self.listTimeSlot)))
-        print("- Fitness = {f} (= {satisfaction}^8 + {fillRate}^4 + {usingCost}^4)".format(
-            f=round(self.fitness(), 2),
-            satisfaction=round(self.satisfaction, 2),
-            fillRate=round(self.fillRate, 2),
-            usingCost=round(self.usingCost, 2)))
 
         print("- Distance = {d}".format(d=self.distance()))
 
         print("Found in {t} / {tt} s".format(t=round(self.foundTime, 2), tt=round(self.totalTime, 2)))
         i = 1
+        print("Nombre de TimeSlot : ", len(self.listTimeSlot), "/", self.numberTimeSlotMax)
+        print("Nombre max de route par timeslot :", self.routePerTimeSlotMax)
+        print("Durée max par route :", self.durationTimeSlotMax)
         for timeSlot in self.listTimeSlot:
             timeSlot.display(i)
             i += 1

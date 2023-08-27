@@ -24,7 +24,7 @@ class ALNS:
         # Initialisation de l'instance
         self.instance = instance
         self.listClient = instance.listClient if listClient is None else listClient
-        self.vehicle = instance.vehicle if vehicle is None else vehicle
+        self.vehicle = instance.collecteur if vehicle is None else vehicle
 
         self.numberTimeSlotMax = numberTimeSlotMax
         self.routePerTimeSlotMax = len(self.listClient) if routePerTimeSlotMax is None else routePerTimeSlotMax
@@ -101,7 +101,7 @@ class ALNS:
             moreClientForCapacity = True
 
             # Tant que la capacité du véhicule n'est pas atteinte
-            while route.getTotalQuantity() <= route.vehicle.capacity and moreClientForCapacity:
+            while route.getTotalQuantity() <= route.collecteur.vehicule_capacite and moreClientForCapacity:
 
                 # Initialisation pour vérifier si un client a été ajouté
                 moreClientForCapacity = False
@@ -109,15 +109,15 @@ class ALNS:
                 # Boucle sur les clients de l'instance
                 for client in listClient:
                     # S'il est non visité, on l'ajoute
-                    if not client.isVisited() and client.indice < 1000:
+                    if not client.visite and client.indice < 1000:
                         route.insertClient(-1, client)
 
                         # Vérification des contraintes de durée du time slot, de capacité du véhicule et d'horaires
                         if timeSlot.getDuration(self.instance.getDistance) <= self.durationTimeSlotMax \
-                                and route.getTotalQuantity() <= route.vehicle.capacity \
+                                and route.getTotalQuantity() <= route.collecteur.vehicule_capacite \
                                 and route.canPass(self.instance.getDistance):
                             # Si oui, alors on valide l'ajout
-                            client.setVisited()
+                            client.visite = True
                             moreClientForCapacity = True
                             moreClientForDuration = True
 
@@ -127,7 +127,7 @@ class ALNS:
 
         return timeSlot
 
-    def createSolution(self):
+    def createSolution(self, order=None):
         """
         FR :
         Méthode de création d'une solution basique
@@ -144,7 +144,7 @@ class ALNS:
         Otherwise we create another time slot
         """
         # Initialisation des variables
-        listClient = methods.order_ListClient_random(self.listClient.copy())
+        listClient = methods.order_ListClient_random(self.listClient.copy()) if order is None else order
         clientNotPlaced = True
 
         # Réinitialisation de la solution courante
@@ -162,13 +162,13 @@ class ALNS:
 
             # Vérification que tous les clients ont étés visités
             for client in self.listClient:
-                if not client.isVisited():
+                if not client.visite:
                     clientNotPlaced = True
                     break
 
         # Réinitialisation des visites des clients
         for client in self.listClient:
-            client.setNotVisited()
+            client.visite = False
 
         return solution
 
@@ -235,6 +235,12 @@ class ALNS:
             if check(solution, self.listClient):
                 return solution
             cpt += 1
+        # dernière tentative avec un tri par horaires
+        copy = self.listClient.copy()
+        solution = self.createSolution(copy.sort(key=lambda x: x.horaires))
+        if check(solution, self.listClient):
+            return solution
+
         return Solution(self.instance, self.numberTimeSlotMax, self.routePerTimeSlotMax, self.durationTimeSlotMax)
 
     def solve(self, pu=100, rho=0.18, sigma1=135, sigma2=70, sigma3=25, tolerance=0.05, coolingRate=0.99975, nc=2000,

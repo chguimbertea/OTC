@@ -1,24 +1,24 @@
 def check_all_visited(listClient, clientToVisit, showLog=False):
     for client in listClient:
-        if client in clientToVisit and not client.isVisited():
+        if client in clientToVisit and not client.visite:
             if showLog:
                 print("Solution non valide - Client {i} non visité".format(i=client.indice))
 
             # Réinitialisation complète de la liste avant de retourner False
             for clientVisited in listClient:
-                clientVisited.setNotVisited()
+                clientVisited.visite = False
             return False
-        elif client not in clientToVisit and client.isVisited():
+        elif client not in clientToVisit and client.visite:
             if showLog:
                 print("Solution non valide - Client {i} visité".format(i=client.indice))
 
             # Réinitialisation complète de la liste avant de retourner False
             for clientVisited in listClient:
-                clientVisited.setNotVisited()
+                clientVisited.visite = False
             return False
         else:
             # S'il a bien été visité et qu'il devait l'être on le réinitialise
-            client.setNotVisited()
+            client.visite = False
     return True
 
 
@@ -57,19 +57,19 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
                 return check(solution, clientToVisit, showLog, notSommetVisited)
 
             '''Contrainte de démarrer du dépôt'''
-            if route.trajet[0].indice != route.vehicle.depot.indice:
+            if route.trajet[0].indice != route.collecteur.indice:
                 if showLog:
                     print("Solution non valide - Début d'une route sans dépôt")
                 return False
 
             '''Contrainte de capacité du véhicule'''
-            if route.getTotalQuantity() > route.vehicle.capacity:
+            if route.getTotalQuantity() > route.collecteur.vehicule_capacite:
                 if showLog:
                     print("Solution non valide - Capacité max du véhicule")
                 return False
 
             '''Contrainte de finir par le dépôt'''
-            if route.trajet[-1].indice != route.vehicle.depot.indice:
+            if route.trajet[-1].indice != route.collecteur.indice:
                 if showLog:
                     print("Solution non valide - Fin d'une route sans dépôt")
                 return False
@@ -84,7 +84,7 @@ def check(solution, clientToVisit=None, showLog=False, notSommetVisited=False):
             if not notSommetVisited:
                 # Validation du passage par le sommet
                 for client in route.trajet:
-                    client.setVisited()
+                    client.visite = True
 
         '''Contrainte de durée du time slot'''
         durationTimeSlot = timeSlot.getDuration(solution.instance.getDistance)
@@ -111,6 +111,6 @@ def quick_check(solution, clientToVisit=None, showLog=False):
                     print("Solution non valide - Horaires non respectés")
                 return False
             for client in route.trajet:
-                client.setVisited()
+                client.visite = True
 
     return check_all_visited(solution.instance.listClient, clientToVisit, showLog)

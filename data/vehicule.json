@@ -1,6 +1,6 @@
 [
     {
-        "nom": "rebooteille",
+        "nom": "REBOOTEILLE",
         "vitesse": 30,
         "capacite": 120,
         "fixedCost": 5,
@@ -13,7 +13,7 @@
         "horaires": [[7, 16], [31, 40], [55, 64], [79, 88], [103, 112]]
     },
     {
-        "nom": "urby",
+        "nom": "URBY LYON",
         "vitesse": 15,
         "capacite": 110,
         "fixedCost": 0,
@@ -25,7 +25,7 @@
         "depotLongitude": 4.920496
     },
     {
-        "nom": "toutEnVelo",
+        "nom": "TOUT EN VELO LYON",
         "vitesse": 15,
         "capacite": 20,
         "crateCost": 2,
@@ -37,7 +37,7 @@
         "horaires": [[7, 12], [31, 36], [55, 60], [79, 84], [103, 108]]
     },
     {
-        "nom": "alpeLogistique",
+        "nom": "GRAP / COOLIVRI",
         "vitesse": 30,
         "capacite": 110,
         "fixedCost": 9,
@@ -50,7 +50,7 @@
         "depotLongitude": 4.932247
     },
     {
-        "nom": "Compostond",
+        "nom": "ENVIE LOIRE",
         "vitesse": 40,
         "capacite": 110,
         "fixedCost": 10,

@@ -127,3 +127,35 @@ def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientIn
     name = "{name}.html".format(name=filename)
     view.save(name)
     print(name + " has been saved")
+
+
+def previewSelection(solution, clients=None, filename="selection"):
+    colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
+    map = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
+
+    if clients is None:
+        clients = []
+    for client in clients:
+        folium.CircleMarker(location=client.localisation.to_tuple(), popup=client.nom,
+                            radius=2, color='black').add_to(map)
+
+    idColor = 0
+    for collecteur in solution.keys():
+        idColor = idColor % len(colors)
+        # DEPOT
+        folium.Marker(collecteur.localisation.to_tuple(), popup=collecteur.nom,
+                      icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(map)
+
+        # POINT
+        for point in solution[collecteur]:
+            for j in range(0, int(point.quantite), 2):
+                folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.nom,
+                                    radius=2*(j+1), color=colors[idColor]).add_to(map)
+            line = [point.localisation.to_tuple(), collecteur.localisation.to_tuple()]
+            folium.PolyLine(line, color=colors[idColor]).add_to(map)
+
+        idColor += 1
+
+    name = "{name}.html".format(name=filename)
+    map.save(name)
+    print(name + " has been saved")

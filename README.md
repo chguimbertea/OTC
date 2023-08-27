@@ -27,3 +27,12 @@ Il peut être remplacé par la minimisation de la distance ou de la durée
 en changeant l'argument correspondant par le mot clé souhaité parmi
 "cost", "distance" et "duration".
 > python3 runBase.py {filePath} {objectif}
+
+#### Partie parametrage de l'ALNS
+Le paramétrage des paramètres de l'ALNS permet de fixer les 4 paramètres non fixés par la littérature. 
+L'algorithme génétique situé dans le module **algoGeneticAlns** est utilise les données du dossier "dataBase" et 
+produit un fichier "gene.csv" contenant le meilleur gene de chaque génération.
+
+Par défaut, nous avons 200 générations et une population de taille 10.
+> python3 runParametrage.py {nbGeneration} {nbPopulation}
+

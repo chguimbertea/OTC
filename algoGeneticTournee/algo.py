@@ -96,21 +96,21 @@ def evaluation():
     global piscine, bestSolution, matingpool, bestFitness
 
     for p in piscine:
-        p.fitness = calculFitness(p.gene)
+        p.fitness_single_routing = calculFitness(p.gene)
 
     indexBest = -1
-    minfit = piscine[0].fitness
-    maxfit = piscine[0].fitness
+    minfit = piscine[0].fitness_single_routing
+    maxfit = piscine[0].fitness_single_routing
     for i, p in enumerate(piscine):
-        if p.fitness < minfit:
-            minfit = p.fitness
+        if p.fitness_single_routing < minfit:
+            minfit = p.fitness_single_routing
 
-        if p.fitness > maxfit:
-            maxfit = p.fitness
+        if p.fitness_single_routing > maxfit:
+            maxfit = p.fitness_single_routing
 
-        if p.fitness <= bestFitness:
+        if p.fitness_single_routing <= bestFitness:
             indexBest = i
-            bestFitness = p.fitness
+            bestFitness = p.fitness_single_routing
 
     if indexBest >= 0:
         bestSolution = piscine[indexBest].gene
@@ -119,12 +119,12 @@ def evaluation():
         if minfit == maxfit:
             f = 5
         else:
-            f = map(p.fitness, minfit, maxfit, 10, 0)
-        p.fitness = f
+            f = map(p.fitness_single_routing, minfit, maxfit, 10, 0)
+        p.fitness_single_routing = f
 
     matingpool = []
     for p in piscine:
-        n = p.fitness
+        n = p.fitness_single_routing
         for i in range(0, int(n)):
             matingpool.append(p)
 

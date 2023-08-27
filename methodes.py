@@ -2,18 +2,19 @@ import math
 import requests
 import geopy.distance as gd
 
-key = None  # "98a66451-2b12-40a8-915b-210343f0d11c"
+key = "98a66451-2b12-40a8-915b-210343f0d11c"
 cpt = 0  # compteur du nombre d'appels à la fonction distance
 
 
-def distance(locI, locJ, mode):
+def distance(locI, locJ, mode=None):
     """
-    key = None, la valeur de la distance retournée est calculée à vol d'oiseau
-    key = value, la valeur de la distance retournée est exacte en tenant compte le chemin emprunté
+    mode = None, la valeur de la distance retournée est calculée à vol d'oiseau
+    mode = value, la valeur de la distance retournée est exacte en tenant compte le chemin emprunté
     """
     global cpt, key
     cpt += 1
-    if key:
+    mode = None
+    if mode:
         r = requests.get("https://graphhopper.com/api/1/route?point=" + locI.to_url() + "&point=" + locJ.to_url()
                          + "&profile=" + mode + "&locale=en&calc_points=false&key=" + key)
         if r.status_code == 200:
@@ -40,56 +41,152 @@ def get_path_details(startLat, startLon, endLat, endLon, mode):
         raise Exception(r.json()['message'])
 
 
-def fitness(solution, collecteur, list_client):
+def fitness_single_routing(solution, collecteur, list_client):
     # INITIALISATION
     quantiteTotale = 0
     distanceTotale = 0
     dureeTotale = 0
     notInRoute = {client.indice: 1 for client in list_client}
 
-    clientArrivee = solution[0]
-    for i in range(1, len(solution)):
-        clientDepart = clientArrivee
-        clientArrivee = solution[i]
-
-        # QUANTITE
-        quantiteTotale += clientArrivee.quantite
-
-        # DISTANCE
+    if solution:
+        clientDepart = collecteur
+        clientArrivee = solution[0]
         dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
         distanceTotale += dist
-
-        # DUREE en min
         dureeTotale += dist / collecteur.vehicule_vitesse * 60
-        dureeTotale += collecteur.temps_collecte_fixe + collecteur.temps_collecte_caisse * clientArrivee.quantite
 
-        # PRESENCE
-        notInRoute[clientArrivee.indice] = 0
+        for i in range(1, len(solution)):
+            clientDepart = clientArrivee
+            clientArrivee = solution[i]
+
+            # QUANTITE
+            quantiteTotale += clientArrivee.quantite
+
+            # DISTANCE
+            dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
+            distanceTotale += dist
+
+            # DUREE en min
+            dureeTotale += dist / collecteur.vehicule_vitesse * 60
+            dureeTotale += collecteur.temps_collecte_fixe + collecteur.temps_collecte_caisse * clientArrivee.quantite
+
+            # PRESENCE
+            notInRoute[clientArrivee.indice] = 0
+
+        clientDepart = clientArrivee
+        clientArrivee = collecteur
+        dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
+        distanceTotale += dist
+        dureeTotale += dist / collecteur.vehicule_vitesse * 60
 
     # TAUX DE REMPLISSAGE
     remplissage = collecteur.vehicule_capacite / max(1, quantiteTotale)
 
     # COUT D'UTILISATION
-    cout = collecteur.cout_fixe + (1 + collecteur.cout_km) * distanceTotale + \
-           collecteur.cout_caisse * quantiteTotale + collecteur.cout_stop * (len(solution) - 2)
+    cout = collecteur.cout_fixe
+    cout += (1 + collecteur.cout_km) * distanceTotale
+    cout += collecteur.cout_caisse * quantiteTotale
+    cout += collecteur.cout_stop * (len(solution) - 2)
 
     # SATISFACTION
     satisfaction = 0
     for client in list_client:
         satisfaction += client.priorite() * notInRoute[client.indice]
 
-    return pow(satisfaction, 8) + pow(remplissage, 4) + pow(cout, 4)
+    return pow(satisfaction, 4) + pow(remplissage, 4) + pow(cout, 4)
 
 
-def farthest_id_client(listClient, collecteur):
-    maxIdClient = -1
+def fitness_multiple_routing(solution, list_client):
+    fitness = 0
+    notInRoute = {client.indice: 1 for client in list_client}
+
+    for collecteur, solution in solution.items():
+        if not solution:
+            continue
+
+        quantiteTotale = 0
+        distanceTotale = 0
+        dureeTotale = 0
+
+        clientDepart = collecteur
+        clientArrivee = solution[0]
+        dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
+        distanceTotale += dist
+        dureeTotale += dist / collecteur.vehicule_vitesse * 60
+
+        for i in range(1, len(solution)):
+            clientDepart = clientArrivee
+            clientArrivee = solution[i]
+
+            # DISTANCE
+            dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
+            distanceTotale += dist
+
+            # DUREE en min
+            dureeTotale += dist / collecteur.vehicule_vitesse * 60
+            dureeTotale += collecteur.temps_collecte_fixe + collecteur.temps_collecte_caisse * clientArrivee.quantite
+
+            # Si le client n'est pas un dépôt
+            if clientArrivee.indice < 999:
+                # QUANTITE
+                quantiteTotale += clientArrivee.quantite
+
+                # PRESENCE
+                notInRoute[clientArrivee.indice] = 0
+
+        clientDepart = clientArrivee
+        clientArrivee = collecteur
+        dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
+        distanceTotale += dist
+        dureeTotale += dist / collecteur.vehicule_vitesse * 60
+
+        # TAUX DE REMPLISSAGE
+        remplissage = collecteur.vehicule_capacite / max(1, quantiteTotale)
+
+        # COUT D'UTILISATION
+        cout = collecteur.cout_fixe
+        cout += (1 + collecteur.cout_km) * distanceTotale
+        cout += collecteur.cout_caisse * quantiteTotale
+        cout += collecteur.cout_stop * (len(solution) - 2)
+
+        fitness += pow(remplissage, 4) + pow(cout, 4)
+
+    # SATISFACTION
+    satisfaction = 0
+    for client in list_client:
+        satisfaction += client.priorite() * notInRoute[client.indice]
+
+    fitness += pow(satisfaction, 4)
+
+    return fitness
+
+
+def remove_farthest_id_client(listClient, collecteur):
+    if not listClient:
+        return None
+    maxId = -1
     maxDist = 0
-    for client in listClient:
+    for i, client in enumerate(listClient):
         dist = distance(collecteur.localisation, client.localisation, collecteur.vehicule_type)
-        if dist > maxDist:
-            maxIdClient = client.indice
+        if dist >= maxDist:
+            maxId = i
             maxDist = dist
-    return maxIdClient
+    if maxId == -1:
+        raise Exception("No farthest client")
+    return listClient.pop(maxId)
+
+
+def nearest_point(mypoint, points):
+    if not points:
+        return None
+    bestPoint = points[0]
+    minDist = 999999999
+    for point in points:
+        dist = distance(mypoint.localisation, point.localisation)/point.vehicule_vitesse
+        if dist < minDist:
+            bestPoint = point
+            minDist = dist
+    return bestPoint
 
 
 def leftmost_client(listClient):
@@ -185,6 +282,8 @@ def inside_intersection(listClientDispo, listConvexHull, focalPoint, residualQua
 
 
 def angle(A, B, C):
+    if A == B or A == C or B == C:
+        return 360  # !! vérifier en amont la suppression correcte des points
     u = vecteur(A, B)
     v = vecteur(A, C)
     scalar = u[0] * v[0] + u[1] * v[1]

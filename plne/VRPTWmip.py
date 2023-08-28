@@ -2,7 +2,7 @@ from mip import *
 import methodes
 import time
 
-TIME_LIMIT = 600  # s
+TIME_LIMIT = 3600  # s
 all_point = []
 distance = {}
 
@@ -20,6 +20,7 @@ def solve(list_client, collecteur, showLog=False):
     distance = {(i, j): methodes.distance(all_point[i].localisation, all_point[j].localisation,
                                           collecteur.vehicule_type) for i in range(NN) for j in range(NN)}
     vv = collecteur.vehicule_vitesse
+    vc = collecteur.vehicule_capacite
     a = collecteur.horaires[0][0]
     b = collecteur.horaires[0][1]
 
@@ -28,7 +29,7 @@ def solve(list_client, collecteur, showLog=False):
     x = [[[model.add_var(name="x(" + str(k) + "," + str(i) + "," + str(j) + ")", var_type=BINARY) for j in range(NN)]
           for i in range(NN)] for k in range(NK)]
     y = [model.add_var(name="y(" + str(k) + ")", var_type=BINARY) for k in range(NK)]
-    z = [[model.add_var(name="z(" + str(k) + "," + str(i) + ")", lb=0, ub=collecteur.vehicule_capacite,
+    z = [[model.add_var(name="z(" + str(k) + "," + str(i) + ")", lb=0, ub=vc,
                         var_type=INTEGER) for i in range(NN)] for k in range(NK)]
     t = [[model.add_var(name="t(" + str(k) + "," + str(i) + ")", lb=0, ub=b,
                         var_type=CONTINUOUS) for i in range(NN)] for k in range(NK)]
@@ -54,7 +55,6 @@ def solve(list_client, collecteur, showLog=False):
         model += (xsum(x[k][i][0] for i in range(1, NN)) == y[k])
 
         # capacite
-        vc = collecteur.vehicule_capacite
         model += (z[k][0] == 0)
         for i in range(1, NN):
             model += (z[k][i] <= vc * y[k])

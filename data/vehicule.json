@@ -1,7 +1,7 @@
 [
     {
         "nom": "REBOOTEILLE",
-        "vitesse": 30,
+        "vitesse": 40,
         "capacite": 120,
         "fixedCost": 5,
         "kmCost": 0.748,

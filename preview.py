@@ -4,11 +4,12 @@ import folium
 from methodes import get_path_details
 
 RADIUS = 3
+COLORS = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
+ANCRE = (45.760266, 4.849236)
 
 
 def preview(solution, collecteur, list_clients=None, filename="routing"):
-    colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
-    routing = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
+    routing = folium.Map(location=ANCRE, zoom_start=10)
 
     # Clients
     list_clients = [] if list_clients is None else list_clients
@@ -26,11 +27,11 @@ def preview(solution, collecteur, list_clients=None, filename="routing"):
             clientsLocation += get_path_details(start[0], start[1], s.localisation.lat, s.localisation.lon,
                                                 collecteur.vehicule_type)
 
-        idColor = idColor % len(colors)
+        idColor = idColor % len(COLORS)
 
         if s.indice == collecteur.indice:
             if depot_is_drawing:
-                folium.PolyLine(clientsLocation, color=colors[idColor]).add_to(routing)
+                folium.PolyLine(clientsLocation, color=COLORS[idColor]).add_to(routing)
                 clientsLocation = []
                 idColor += 1
             else:
@@ -39,7 +40,7 @@ def preview(solution, collecteur, list_clients=None, filename="routing"):
                 depot_is_drawing = True
         else:
             folium.Marker(s.localisation.to_tuple(), popup=s.nom,
-                          icon=folium.Icon(color=colors[idColor], icon='boxes-stacked', prefix='fa')).add_to(routing)
+                          icon=folium.Icon(color=COLORS[idColor], icon='boxes-stacked', prefix='fa')).add_to(routing)
 
     name = "{name}.html".format(name=filename)
     routing.save(name)
@@ -48,8 +49,7 @@ def preview(solution, collecteur, list_clients=None, filename="routing"):
 
 
 def previewSolution(solution, filename=None):
-    colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
-    routing = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
+    routing = folium.Map(location=ANCRE, zoom_start=10)
 
     # Clients
     for client in solution.instance.listClient:
@@ -61,12 +61,12 @@ def previewSolution(solution, filename=None):
             if len(route.trajet) == 0:
                 continue
 
-            idColor = idColor % len(colors)
+            idColor = idColor % len(COLORS)
 
             # Depot
             depot = route.trajet[0]
             folium.Marker(depot.localisation.to_tuple(), popup=depot.nom,
-                          icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(routing)
+                          icon=folium.Icon(color=COLORS[idColor], icon='warehouse', prefix='fa')).add_to(routing)
 
             # Routing
             clientsLocation = []
@@ -74,9 +74,9 @@ def previewSolution(solution, filename=None):
                 clientsLocation.append(client.localisation.to_tuple())
                 if client.indice < 999:
                     folium.Marker(client.localisation.to_tuple(), popup=client.indice,
-                                  icon=folium.Icon(color=colors[idColor], icon='boxes-stacked', prefix='fa')).add_to(
+                                  icon=folium.Icon(color=COLORS[idColor], icon='boxes-stacked', prefix='fa')).add_to(
                         routing)
-            folium.PolyLine(clientsLocation, color=colors[idColor]).add_to(routing)
+            folium.PolyLine(clientsLocation, color=COLORS[idColor]).add_to(routing)
 
             idColor += 1
 
@@ -105,7 +105,7 @@ def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientIn
     convexHullColor = 'black'
     insideColor = 'purple'
     allColor = 'blue'
-    view = folium.Map(location=(45.760266, 4.849236), zoom_start=11)
+    view = folium.Map(location=ANCRE, zoom_start=11)
 
     if focalPoint is not None:
         folium.Marker(focalPoint, popup='focal', icon=folium.Icon(color='black')).add_to(view)
@@ -130,8 +130,7 @@ def previewConvexHull(listSelectedClient, listConvexHullPoint=None, listClientIn
 
 
 def previewSelection(solution, clients=None, filename="selection"):
-    colors = ['red', 'blue', 'purple', 'orange', 'green', 'gray', 'darkblue', 'darkred', 'darkgreen', 'cadetblue']
-    map = folium.Map(location=(45.760266, 4.849236), zoom_start=10)
+    map = folium.Map(location=ANCRE, zoom_start=10)
 
     if clients is None:
         clients = []
@@ -141,18 +140,18 @@ def previewSelection(solution, clients=None, filename="selection"):
 
     idColor = 0
     for collecteur in solution.keys():
-        idColor = idColor % len(colors)
+        idColor = idColor % len(COLORS)
         # DEPOT
         folium.Marker(collecteur.localisation.to_tuple(), popup=collecteur.nom,
-                      icon=folium.Icon(color=colors[idColor], icon='warehouse', prefix='fa')).add_to(map)
+                      icon=folium.Icon(color=COLORS[idColor], icon='warehouse', prefix='fa')).add_to(map)
 
         # POINT
         for point in solution[collecteur]:
             for j in range(0, int(point.quantite), 2):
                 folium.CircleMarker(location=point.localisation.to_tuple(), popup=point.nom,
-                                    radius=2*(j+1), color=colors[idColor]).add_to(map)
+                                    radius=2*(j+1), color=COLORS[idColor]).add_to(map)
             line = [point.localisation.to_tuple(), collecteur.localisation.to_tuple()]
-            folium.PolyLine(line, color=colors[idColor]).add_to(map)
+            folium.PolyLine(line, color=COLORS[idColor]).add_to(map)
 
         idColor += 1
 

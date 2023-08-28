@@ -444,7 +444,6 @@ class ALNS:
         if showLog:
             print("Cost = {cost}".format(cost=self.bestSolution.cost()))
             print("Time = {time}/{total}".format(time=self.bestSolution.foundTime, total=self.bestSolution.totalTime))
-            print("fitness = {f}".format(f=self.bestSolution.fitness()))
             # self.display()
             print("#####")
             plt.plot(self.evolution_iter_best, self.evolution_cost)

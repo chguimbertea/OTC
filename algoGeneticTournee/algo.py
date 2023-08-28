@@ -1,11 +1,13 @@
 import copy
-import math
 import random
 import webbrowser
 
 from algoGeneticTournee.dna import Dna
 from methodes import distance
 from preview import previewConvexHull
+
+# CHANGE THE PATH
+VIEW_PATH = 'file:///home/chloe/PycharmProjects/optimisationTournee/view.html'
 
 runing = False
 pointsDePassage = []
@@ -161,9 +163,8 @@ def run(showLog=False):
 
         previewConvexHull(listC, listLocation)
 
-        if runing == False:
-            # CHANGE THE PATH
-            webbrowser.open('file:///home/chloe/PycharmProjects/optimisationTournee/view.html')
+        if not runing:
+            webbrowser.open(VIEW_PATH)
             runing = True
 
 

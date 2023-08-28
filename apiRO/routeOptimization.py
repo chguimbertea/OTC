@@ -2,6 +2,9 @@ import json
 import math
 import requests
 
+# key = "98a66451-2b12-40a8-915b-210343f0d11c"
+key = "0046f82f-a3f3-4503-a204-1f9519bdae8f"
+
 
 def write_time_windows(horaires):
     tw = []
@@ -29,7 +32,7 @@ def write_services(list_client, collecteur):
             },
             "duration": d,
             "size": [
-                client.quantite
+                int(client.quantite)
             ],
             "time_windows": tw
         }
@@ -37,19 +40,13 @@ def write_services(list_client, collecteur):
     return services
 
 
-def solve(list_client, collecteur, showLog=False):
-    url = "https://graphhopper.com/api/1/vrp"
-    query = {"key": "98a66451-2b12-40a8-915b-210343f0d11c"}
-    headers = {"Content-Type": "application/json"}
-
-    services = write_services(list_client, collecteur)
-    start = math.floor(collecteur.horaires[0][0] * 3600)
-    end = math.floor(collecteur.horaires[0][1] * 3600)
-
-    payload = {
-        "vehicles": [
-            {
-                "vehicle_id": collecteur.nom,
+def write_vehicles(collecteur):
+    vehicles = []
+    for j, h in enumerate(collecteur.horaires):
+        start = math.floor(h[0] * 3600)
+        end = math.floor(h[1] * 3600)
+        v = {
+                "vehicle_id": collecteur.nom+"-"+str(j+1),
                 "type_id": collecteur.vehicule_type,
                 "start_address": {
                     "location_id": "depot_" + collecteur.nom,
@@ -59,12 +56,24 @@ def solve(list_client, collecteur, showLog=False):
                 "earliest_start": start,
                 "latest_end": end
             }
-        ],
+        vehicles.append(v)
+    return vehicles
+
+
+def solve(list_client, collecteur, showLog=False):
+    url = "https://graphhopper.com/api/1/vrp"
+    query = {"key": key}
+    headers = {"Content-Type": "application/json"}
+
+    services = write_services(list_client, collecteur)
+
+    payload = {
+        "vehicles": write_vehicles(collecteur),
         "vehicle_types": [
             {
                 "type_id": collecteur.vehicule_type,
                 "capacity": [
-                    collecteur.vehicule_capacite
+                    int(collecteur.vehicule_capacite)
                 ],
                 "profile": collecteur.vehicule_type,
                 "speed_factor": 0.9
@@ -75,7 +84,9 @@ def solve(list_client, collecteur, showLog=False):
         "objectives": [
             {
                 "type": "min",
-                "value": "transport_time"
+                "value": "completion_time"
+                # completion_time pour ajouter les temps d'attente
+                # transport_time pour seulement les temps de trajet
             }
         ],
         "configuration": {
@@ -92,6 +103,10 @@ def solve(list_client, collecteur, showLog=False):
         }
     }
 
+    if showLog:
+        with open("input.json", "w") as outfile:
+            json.dump(payload, outfile, indent=4)
+
     response = requests.post(url, json=payload, headers=headers, params=query)
 
     if response.status_code != 200:
@@ -100,19 +115,21 @@ def solve(list_client, collecteur, showLog=False):
 
     jdata = response.json()
 
-    if showLog:
-        with open("route.json", "w") as outfile:
+    if showLog or True:
+        with open("output.json", "w") as outfile:
             json.dump(jdata['solution'], outfile, indent=4)
 
-        print("Distance de l'API :", jdata['solution']['routes'][0]['distance'])
-
     dict_client = {str(client.indice): client for client in list_client}
-    data = jdata['solution']['routes'][0]['activities']
     solution = []
-    for d in data:
-        if d['type'] == "start" or d['type'] == "end":
-            solution.append(collecteur)
-        else:
-            solution.append(dict_client[d['id'][2:]])
+    temps = -1
+    if len(jdata['solution']['routes']):
+        data = jdata['solution']['routes'][0]['activities']
+        temps = jdata['solution']['routes'][0]['completion_time']
+        for d in data:
+            if d['type'] == "start" or d['type'] == "end":
+                solution.append(collecteur)
+            else:
+                solution.append(dict_client[d['id'][2:]])
 
     return solution
+    # return solution, temps

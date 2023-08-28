@@ -1,3 +1,5 @@
+import pandas as pd
+
 import methodes
 from Solver import Solver
 from algoGeneticTournee import algoGenConvertisseur
@@ -15,20 +17,26 @@ def value(solution, mode):
     return dist
 
 
+def routing(route):
+    if not route:
+        print("Chemin vide")
+        return ""
+    chemin = "{i}".format(i=route[0].indice)
+    for client in route[1:]:
+        chemin += " -> {i}".format(i=client.indice)
+    print("Chemin : {chemin}".format(chemin=chemin))
+    return chemin
+
+
 if __name__ == "__main__":
     # FILE
     file = open("comparaison.csv", "w+")
-    file.write("Instance;Nbr points;Methode;Distance;Temps\n")
+    file.write("Instance;Nbr points;Methode;Distance;Temps;Chemin\n")
 
     # INSTANCE
     instance = 'Hub3'
     collecteurs = parse_collecteurs("data/vehicule.json")
-    clients = parse_clients("data/points60.csv")
     collecteur = collecteurs[0]
-    selection = []
-    for i in [0, 11, 35, 47, 50]:
-    #for i in [0, 11, 12, 31, 35, 45, 47, 50, 51, 62]:
-        selection.append(clients[i])
 
     # SOLVERS
     solverAlns = Solver(alnsConvertisseur)
@@ -36,23 +44,50 @@ if __name__ == "__main__":
     solverAPI = Solver(routeOptimization)
     solverMip = Solver(VRPTWmip)
 
-    solvers = [solverAlns, solverGen, solverAPI, solverMip]
-    noms = ["ALNS", "AlgoGen", "RO_API", "MIP"]
+    # solvers = [solverAlns, solverGen, solverAPI, solverMip]
+    # noms = ["ALNS", "AlgoGen", "RO_API", "MIP"]
+    solvers = [solverAlns, solverGen, solverAPI]
+    noms = ["ALNS", "AlgoGen", "RO_API"]
 
     list_solvers = []
     list_noms = []
-    for i in range(4):
+    for i in range(len(solvers)):
         list_solvers.append(solvers[i])
         list_noms.append(noms[i])
 
-    nbr = str(len(selection))
+    first = True
 
-    for j in range(10):
+    for i in range(2):
+        if first:
+            clients = parse_clients("data/points51222.csv", pd.Timestamp(year=2022, month=12, day=5))
+            first = False
+        else:
+            clients = parse_clients("data/points80123.csv", pd.Timestamp(year=2023, month=1, day=8))
+
+        # SELECTION DE POINTS
+        selection = []
+        clients.sort(key=lambda x: (x.priorite(), x.capacite), reverse=True)
+        while clients and clients[0].priorite() > 0.4:
+            selection.append(clients.pop(0))
+
+        nbr = str(len(selection))
+
         for i, s in enumerate(list_solvers):
-            print("Solving", instance, "with", list_noms[i])
-            start = time.perf_counter()
-            solution = s.solve(selection, collecteur)
-            tps = time.perf_counter() - start
-            distance = value(solution, collecteur.vehicule_type)
-            file.write(instance + ";" + nbr + ";" + list_noms[i] + ";" + str(distance) + ";" + str(tps) + "\n")
-        time.sleep(30)
+            for j in range(10):
+                print("Solving", instance, "with", list_noms[i])
+                start = time.perf_counter()
+                solution = s.solve(selection, collecteur)
+                tps = time.perf_counter() - start
+                distance = value(solution, collecteur.vehicule_type)
+                line = instance + ";" + nbr + ";" + list_noms[i] + ";" + str(distance) + ";" + str(tps) + ";" + routing(solution) + "\n"
+                file.write(line)
+                time.sleep(10)
+
+        """print("Solving", instance, "with MIP")
+        start = time.perf_counter()
+        solution = solverMip.solve(selection, collecteur)
+        tps = time.perf_counter() - start
+        distance = value(solution, collecteur.vehicule_type)
+        line = instance + ";" + nbr + "; MIP ;" + str(distance) + ";" + str(tps) + ";" + routing(solution) + "\n"
+        file.write(line)
+        routing(solution)"""

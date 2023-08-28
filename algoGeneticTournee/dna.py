@@ -1,10 +1,11 @@
 import random
 from math import floor
-from methodes import distance
 
 
 class Dna:
-    def __init__(self, gene=[]):
+    def __init__(self, gene=None):
+        if gene is None:
+            gene = []
         self.gene = gene
         self.fitness = None
 
@@ -20,8 +21,8 @@ class Dna:
                 gene.append(i)
         return gene
 
-    def mutation(self, range):
-        if random.uniform(0, 1) < range:
+    def mutation(self, bound):
+        if random.uniform(0, 1) < bound:
             i = random.randint(0, len(self.gene) - 1)
             j = random.randint(0, len(self.gene) - 1)
             c = self.gene[i]

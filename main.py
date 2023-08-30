@@ -34,36 +34,22 @@ def value(solution, mode):
 
 
 if __name__ == "__main__":
-    nom = 'Dec'
+    """nom = 'Dec'
     jour = pd.Timestamp(year=2022, month=12, day=5)
-    clients = parse_clients("data/points51222.csv", jour)
+    clients = parse_clients("data/points51222.csv", jour)"""
 
-    """nom = 'Janv'
+    nom = 'Janv'
     jour = pd.Timestamp(year=2023, month=1, day=8)
-    clients = parse_clients("data/points80123.csv", jour)"""
+    clients = parse_clients("data/points80123.csv", jour)
 
     collecteurs = parse_collecteurs("data/vehicule.json")
 
-    """
-    print("Requete :")
-    for c in clients:
-        if c.requete:
-            print(c.indice, c.nom, c.quantite, c.capacite, c.priorite())
-    print()
-    """
-    if False:
-        clients.sort(key=lambda x: (x.priorite(), x.capacite), reverse=True)
-        clients = clients[:15]
-
-        for c in clients:
-            print(c.indice, c.quantite, c.capacite, c.priorite())
-
     # ALNS
-    # methode = alnsConvertisseur
+    methode = alnsConvertisseur
     # ALGO GENETIQUE
     # methode = algoGenConvertisseur
     # ROUTE OPTIMIZATION API
-    methode = routeOptimization
+    # methode = routeOptimization
     # MIP
     # methode = VRPTWmip
 
@@ -74,7 +60,7 @@ if __name__ == "__main__":
 
     if mode == 'selection':
         print("Prépocessus en cours...")
-        #solution = solver.selection(clients, collecteurs, methode_int=0)
+        # solution = solver.selection(clients, collecteurs, methode_int=0)
         solution = solver.preprocess(clients, collecteurs)
         for s in solution.keys():
             print("\nCollecteur : {n}".format(n=s.nom))

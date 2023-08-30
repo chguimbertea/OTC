@@ -34,7 +34,6 @@ if __name__ == "__main__":
     file.write("Instance;Nbr points;Methode;Distance;Temps;Chemin\n")
 
     # INSTANCE
-    instance = 'Hub3'
     collecteurs = parse_collecteurs("data/vehicule.json")
     collecteur = collecteurs[0]
 
@@ -46,8 +45,8 @@ if __name__ == "__main__":
 
     # solvers = [solverAlns, solverGen, solverAPI, solverMip]
     # noms = ["ALNS", "AlgoGen", "RO_API", "MIP"]
-    solvers = [solverAlns, solverGen, solverAPI]
-    noms = ["ALNS", "AlgoGen", "RO_API"]
+    solvers = []
+    noms = []
 
     list_solvers = []
     list_noms = []
@@ -55,14 +54,17 @@ if __name__ == "__main__":
         list_solvers.append(solvers[i])
         list_noms.append(noms[i])
 
-    first = True
+    first = False
 
-    for i in range(2):
+    for i in range(1):
         if first:
+            instance = 'Dec'
             clients = parse_clients("data/points51222.csv", pd.Timestamp(year=2022, month=12, day=5))
             first = False
         else:
+            instance = 'Jan'
             clients = parse_clients("data/points80123.csv", pd.Timestamp(year=2023, month=1, day=8))
+            first = True
 
         # SELECTION DE POINTS
         selection = []
@@ -81,13 +83,14 @@ if __name__ == "__main__":
                 distance = value(solution, collecteur.vehicule_type)
                 line = instance + ";" + nbr + ";" + list_noms[i] + ";" + str(distance) + ";" + str(tps) + ";" + routing(solution) + "\n"
                 file.write(line)
-                time.sleep(10)
+                time.sleep(50)
 
-        """print("Solving", instance, "with MIP")
-        start = time.perf_counter()
-        solution = solverMip.solve(selection, collecteur)
-        tps = time.perf_counter() - start
-        distance = value(solution, collecteur.vehicule_type)
-        line = instance + ";" + nbr + "; MIP ;" + str(distance) + ";" + str(tps) + ";" + routing(solution) + "\n"
-        file.write(line)
-        routing(solution)"""
+        if not solvers:
+            print("Solving", instance, "with MIP")
+            start = time.perf_counter()
+            solution = solverMip.solve(selection, collecteur)
+            tps = time.perf_counter() - start
+            distance = value(solution, collecteur.vehicule_type)
+            line = instance + ";" + nbr + "; MIP ;" + str(distance) + ";" + str(tps) + ";" + routing(solution) + "\n"
+            file.write(line)
+            routing(solution)

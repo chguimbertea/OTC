@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 class ALNS:
     bound = 1000
 
-    def __init__(self, instance, numberTimeSlotMax=1, routePerTimeSlotMax=None, durationTimeSlotMax=420,
+    def __init__(self, instance, numberTimeSlotMax=1, routePerTimeSlotMax=None, durationTimeSlotMax=1200,
                  listClient=None, vehicle=None):
         # Initialisation de l'instance
         self.instance = instance
@@ -79,8 +79,15 @@ class ALNS:
         self.evolution_time_best = None
         self.evolution_cost = None
 
-    def createTimeSlot(self, listClient):
+    def createTimeSlot(self, listClient, order=None):
         timeSlot = TimeSlot()
+
+        if not order:
+            for client in listClient:
+                route = Route(self.vehicle)
+                route.insertClient(-1, client)
+                timeSlot.appendRoute(route)
+            return timeSlot
 
         # Booléen indiquant lorsque aucun client ne peut être ajouté sans violer la contrainte de durée
         moreClientForDuration = True
@@ -144,7 +151,7 @@ class ALNS:
         Otherwise we create another time slot
         """
         # Initialisation des variables
-        listClient = methods.order_ListClient_random(self.listClient.copy()) if order is None else order
+        listClient = methods.order_ListClient_random(self.listClient.copy()) if order is None or not order else order
         clientNotPlaced = True
 
         # Réinitialisation de la solution courante
@@ -237,7 +244,8 @@ class ALNS:
             cpt += 1
         # dernière tentative avec un tri par horaires
         copy = self.listClient.copy()
-        solution = self.createSolution(copy.sort(key=lambda x: x.horaires))
+        copy.sort(key=lambda x: x.horaires)
+        solution = self.createSolution(copy)
         if check(solution, self.listClient):
             return solution
 

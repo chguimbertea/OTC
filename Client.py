@@ -24,13 +24,15 @@ class Client:
     def ratio(self):
         return self.quantite / self.capacite
 
+    def jour_avant_surcharge(self):
+        if self.quantite == 0:
+            # retourner le temps moyen entre 2 collectes
+            return 30
+        return self.jours_depuis_collecte * (self.capacite / self.quantite - 1)
+
     def priorite(self):
         # return (1 + self.requete) * self.ratio()
-        if self.quantite == 0 or self.jours_depuis_collecte == 0:
-            return 0
-        if self.jours_depuis_collecte != 0:
-            vitesse_remplissage = max(0.1, self.jours_depuis_collecte * (self.capacite / self.quantite - 1))
-            return (1 + self.requete) / vitesse_remplissage
+        return (1 + self.requete) / max(0.1, self.jour_avant_surcharge())
 
     def display(self):
         print("- Client = {c} : {nom}".format(c=self.indice, nom=self.nom))

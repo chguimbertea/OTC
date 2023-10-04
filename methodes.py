@@ -2,7 +2,8 @@ import math
 import requests
 import geopy.distance as gd
 
-key = "98a66451-2b12-40a8-915b-210343f0d11c"
+# key = "98a66451-2b12-40a8-915b-210343f0d11c"
+key = "0046f82f-a3f3-4503-a204-1f9519bdae8f"
 cpt = 0  # compteur du nombre d'appels à la fonction distance
 
 
@@ -59,16 +60,17 @@ def fitness_single_routing(solution, collecteur, list_client):
             clientDepart = clientArrivee
             clientArrivee = solution[i]
 
-            # QUANTITE
-            quantiteTotale += clientArrivee.quantite
+            if clientArrivee.indice < 1000:
+                # QUANTITE
+                quantiteTotale += clientArrivee.quantite
+
+                # DUREE en min
+                dureeTotale += dist / collecteur.vehicule_vitesse * 60
+                dureeTotale += collecteur.temps_collecte_fixe + collecteur.temps_collecte_caisse * clientArrivee.quantite
 
             # DISTANCE
             dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
             distanceTotale += dist
-
-            # DUREE en min
-            dureeTotale += dist / collecteur.vehicule_vitesse * 60
-            dureeTotale += collecteur.temps_collecte_fixe + collecteur.temps_collecte_caisse * clientArrivee.quantite
 
             # PRESENCE
             notInRoute[clientArrivee.indice] = 0
@@ -100,27 +102,24 @@ def fitness_multiple_routing(solution, list_client):
     fitness = 0
     notInRoute = {client.indice: 1 for client in list_client}
 
-    for collecteur, solution in solution.items():
-        if not solution:
+    for collecteur, sol in solution.items():
+        if not sol:
             continue
 
         quantiteTotale = 0
-        distanceTotale = 0
         dureeTotale = 0
 
         clientDepart = collecteur
-        clientArrivee = solution[0]
+        clientArrivee = sol[0]
         dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
-        distanceTotale += dist
         dureeTotale += dist / collecteur.vehicule_vitesse * 60
 
-        for i in range(1, len(solution)):
+        for i in range(1, len(sol)):
             clientDepart = clientArrivee
-            clientArrivee = solution[i]
+            clientArrivee = sol[i]
 
             # DISTANCE
             dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
-            distanceTotale += dist
 
             # DUREE en min
             dureeTotale += dist / collecteur.vehicule_vitesse * 60
@@ -137,31 +136,24 @@ def fitness_multiple_routing(solution, list_client):
         clientDepart = clientArrivee
         clientArrivee = collecteur
         dist = distance(clientDepart.localisation, clientArrivee.localisation, collecteur.vehicule_type)
-        distanceTotale += dist
         dureeTotale += dist / collecteur.vehicule_vitesse * 60
 
-        # TAUX DE REMPLISSAGE
+        # INVERSE TAUX DE REMPLISSAGE
         remplissage = collecteur.vehicule_capacite / max(1, quantiteTotale)
 
-        # COUT D'UTILISATION
-        cout = collecteur.cout_fixe
-        cout += (1 + collecteur.cout_km) * distanceTotale
-        cout += collecteur.cout_caisse * quantiteTotale
-        cout += collecteur.cout_stop * (len(solution) - 2)
-
-        fitness += pow(remplissage, 4) + pow(cout, 4)
+        fitness += remplissage + dureeTotale
 
     # SATISFACTION
     satisfaction = 0
     for client in list_client:
         satisfaction += client.priorite() * notInRoute[client.indice]
 
-    fitness += pow(satisfaction, 4)
+    fitness += satisfaction
 
     return fitness
 
 
-def remove_farthest_id_client(listClient, collecteur):
+def remove_farthest_client(listClient, collecteur):
     if not listClient:
         return None
     maxId = -1

@@ -34,13 +34,13 @@ def value(solution, mode):
 
 
 if __name__ == "__main__":
-    """nom = 'Dec'
+    nom = 'Dec'
     jour = pd.Timestamp(year=2022, month=12, day=5)
-    clients = parse_clients("data/points51222.csv", jour)"""
+    clients = parse_clients("data/pointsDec.csv", jour)
 
-    nom = 'Janv'
+    """nom = 'Janv'
     jour = pd.Timestamp(year=2023, month=1, day=8)
-    clients = parse_clients("data/points80123.csv", jour)
+    clients = parse_clients("data/pointsJan.csv", jour)"""
 
     collecteurs = parse_collecteurs("data/vehicule.json")
 
@@ -55,19 +55,17 @@ if __name__ == "__main__":
 
     solver = Solver(methode)
 
-    modes = ['rien', 'selection', 'resolution', 'combo']
-    mode = modes[2]
+    modes = ['rien', 'selection', 'resolution']
+    mode = modes[1]
 
     if mode == 'selection':
         print("Prépocessus en cours...")
-        # solution = solver.selection(clients, collecteurs, methode_int=0)
         solution = solver.preprocess(clients, collecteurs)
-        for s in solution.keys():
-            print("\nCollecteur : {n}".format(n=s.nom))
-            print_route(solution[s], True)
-            print("Valeur :", methodes.fitness_single_routing(solution[s], s, clients))
+        for c, s in solution.items():
+            print("\nCollecteur : {n}".format(n=c.nom))
+            print_route(s, False)
         print("Valeur :", methodes.fitness_multiple_routing(solution, clients))
-        previewSelection(solution, clients)
+        # previewSelection(solution, clients)
 
     if mode == 'resolution':
         print("Résolution en cours...")

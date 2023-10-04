@@ -2,12 +2,16 @@
 Projet de stage de Master 2 sur l'optimisation des tournées de véhicules 
 appliquées à la collecte de bouteilles en verre consignées
 
-Dernière mise-à-jour le : [2023-08-27]
+Dernière mise-à-jour le : [2023-10-04]
 
-**Statut** : en développement
+**Statut** : en pause
 
 ## Installation
-- [ ] faire la liste des besoins pour le bon fonctionnement du code
+Les librairies nécessaires à l'exécution du code sont :
+- pandas
+- geopy
+- folium
+- matplotlib
 
 ## Utilisation
 
@@ -66,6 +70,19 @@ des performances de chaque méthode et aide à choisir la plus appropriée pour 
 > python3 runComparaison.py
 
 Chaque méthode peut également être exécutée individuellement dans l'exécutable "main.py".
+
+### Solver
+Une instance de la classe **Solver** à besoin d'une méthode parmi les suivantes :
+- **alnsConvertisseur** : ALNS
+- **algoGenConvertisseur** : Algorithme génétique
+- **routeOptimization** : API d'optimisation de route
+- **VRPTWmip** : programme linéaire en nombre entier
+
+La fonction **preprocess** prend en paramètre la liste des clients et la liste des collecteurs disponibles.
+Elle retourne la ou les meilleurs routes trouvées par collecteur.
+
+La fonction **solve** prend la liste des clients à visiter et le collecteur pour effectuer la tournée.
+Elle retourne le meilleur chemin trouvé en utilisant la méthode choisie précédemment.
 
 ## Affichage
 
